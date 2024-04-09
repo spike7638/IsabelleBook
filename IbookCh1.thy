@@ -725,6 +725,63 @@ proof -
   have 8:"(c  \<ominus> a) \<in> P" using 7 diff_def by auto
   show ?thesis using 8 lt_def gt_def by auto
 qed
+
+definition NN where "NN = P \<union> {Z}"
+
+lemma NN_closure:
+  fixes a b
+  assumes "a \<in>  NN"
+  assumes "b \<in>  NN"
+  assumes "b \<in>  NN"
+  shows "a  \<oplus> b  \<in>  NN"
+proof (cases "a = Z")
+  case True
+  have 0: "a  \<oplus> b = b" using True additive_ident by auto
+  have 1: "b  \<in>  NN" using assms by auto
+  then show ?thesis using 0 1 by auto
+next
+  case False
+  have aPos: "a \<in> P" using False NN_def assms 
+    by auto
+  then show ?thesis 
+  proof (cases "b = Z")
+    case True
+    have 1: "a  \<oplus> b = a"  using True additive_ident by auto
+    have 2: "a  \<oplus> b \<in> P" using 1 aPos by auto
+    then show ?thesis using 2 assms NN_def by auto
+  next
+    case False
+    have 3:"b \<in> P" using NN_def assms False by auto
+    have 4: "a  \<oplus> b \<in> P" using 3 aPos additive_closure by auto
+    then show ?thesis using 4 assms NN_def by auto
+  qed
+
+qed
+
+lemma almost_done_le: 
+  fixes a b c
+  assumes "le a b" and "le b c"
+  shows "le a  c"
+proof -
+ 
+  have 0:"(b  \<ominus> a) \<in> NN" using assms(1) le_def gt_def 
+    by (metis NN_def UnI1 UnI2 lt_def negsub singletonI trichotomy2)
+  have 1:"(c  \<ominus> b) \<in> NN" using assms(2) le_def gt_def  
+    by (metis NN_def UnI1 UnI2 lt_def negsub singletonI trichotomy2)
+  have 2:"(c  \<ominus> b)  \<oplus> (b  \<ominus> a) \<in> NN" using 0 1 additive_closure NN_def 
+    using NN_closure by auto
+  have 3:"(c  \<oplus> (neg b))  \<oplus> (b   \<oplus> (neg a)) \<in> NN" using 2 diff_def by auto
+  have 4:"c  \<oplus> ((neg b)  \<oplus> (b   \<oplus> (neg a))) \<in> NN" using 3 plus_assoc by auto
+  have 5:"c  \<oplus> (((neg b)  \<oplus> b)   \<oplus> (neg a)) \<in> NN" using 4 plus_assoc by auto
+  have 6:"c  \<oplus> (Z   \<oplus> (neg a)) \<in> NN" using 5 negation by auto
+  have 7:"c  \<oplus> (neg a) \<in> NN" using 6 additive_ident by auto
+  have 8:"(c  \<ominus> a) \<in> NN" using 7 diff_def by auto
+  show ?thesis using 8 lt_def gt_def le_def NN_def
+    by (smt (verit, ccfv_threshold) additive_closure 
+    additive_ident(2) assms(1) assms(2) diff_def negation(2) plus_assoc)
+qed
+
+
 thm lt_def
 thm gt_def
 
@@ -862,8 +919,8 @@ proof (cases "ge a Z")
   have aNeg: "lt a Z" using False lt_def  aPos by auto
   have aFact: "Na = (neg a)" using assms abs_def aPos 
     ge_def gt_def negZ  False by fastforce
-  show ?thesis 
-  proof (cases "ge b Z")
+(*   show ?thesis 
+  proof (cases "ge b Z") *)
     oops
 
 lemma ti1:
@@ -964,17 +1021,15 @@ proof - (* a \<ge> 0; b < 0; (a+b) \<le> 0. *)
     by (metis ge_def help3 lt_def negsub subtractZ3)
   have 5: "le  Z a" using assms(5) le_def 
     by (metis "0" abs_def assms(3) lt_def trichotomy)
-  have 6 "le (neg a) a" using 4 5 le_def lt_def try0
-(*  have 5: "lt ((neg a)  \<ominus> b)  (a  \<ominus> b)" using 4 assms le_def lt_def gt_def slightly_more_interesting by auto
-  have 6: "lt (a \<oplus> b)  (a \<oplus> (neg b))" using 5 plus_commute by auto
-  have 7: "lt Nab (Na \<oplus> Nb)" using 6 le_def 3 0 1 by auto
-  have 8: "le Nab (Na \<oplus> Nb)" using 7 le_def by auto
-  then show ?thesis using 8 by auto *)
+  have 6: "le (neg a) a"
+    using "4" "5" almost_done_le by blast  
+  have 7: "le ((neg a)  \<ominus> b)  (a  \<ominus> b)" using 4 assms le_def lt_def gt_def slightly_more_interesting 
+    by (metis "6" diff_def)
+  have 8: "le ((neg a)  \<ominus> b)  (a \<oplus> (neg b))" using 7 plus_commute diff_def by auto
+  have 9: "le Nab (Na \<oplus> Nb)" using 8 le_def 3 0 1 by auto
+  have 10: "le Nab (Na \<oplus> Nb)" using 9 le_def by auto
+  then show ?thesis using 10 by auto 
 qed
-
-
-
-
 
 lemma triangle_inequality_spivak:
   fixes a::r and  b
@@ -984,27 +1039,74 @@ lemma triangle_inequality_spivak:
   shows "le Nab (Na  \<oplus> Nb)" 
 proof (cases "ge a Z")
   case True
+  have aPos: "ge a Z" using True by auto
   then show ?thesis 
   proof (cases "ge b Z")
     case True
-    then show ?thesis sorry
+    have bPos: "ge b Z" using True by auto
+    then show ?thesis using aPos bPos assms ti1 by auto
   next (* a \<ge> 0, b < 0 case *)
     case False
-    then show ?thesis sorry
+    have bNeg: "lt b Z" using False lt_def ge_def gt_def trichotomy3 by fastforce 
+    then show ?thesis using aPos bNeg assms sorry
+(*      by (smt (verit) le_def lt_def ti4 trichotomy3) 
   qed
 
   case False (* a < 0 *)
-  show "le Nab (Na \<oplus> Nb)"
+  also have aNeg: "lt a Z" using False lt_def ge_def gt_def trichotomy3 True by fastforce 
+  then show ?thesis sorry
   proof (cases "ge b Z")
     case True(* a < -0, b \<ge> 0 *)
-    then show ?thesis sorry
+    have bPos: "ge b Z" using False by (simp add: aPos)
+
+    then show ?thesis using aNeg bPos ti3 le_def lt_def trichotomy3 try
   next (* a < 0, b < 0  *)
     case False
+    have bNeg: "lt b Z" using False lt_def ge_def gt_def trichotomy3 by fastforce 
     then show ?thesis sorry
-  qed
+  qed *)
+
+lemma ge_lt:
+  fixes b
+  assumes "(\<not> ge b Z)"
+  shows "lt b Z"
+proof -
+  have 0:  "\<not>((b \<ominus> Z)  \<in> P) \<and> (b \<noteq> Z)" using assms ge_def by simp
+  have 1:  "\<not>((b \<ominus> Z)  \<in> P)" using 0 by simp
+  have 2:  "\<not>(b  \<in> P)" using 1 subtractZ3 by auto
+  have 3: " (neg b) \<in> P" using 0 2 trichotomy by auto
+  have 4: " (neg b) = Z \<ominus> b"  using diff_def additive_ident by auto
+  show ?thesis using gt_def 4 3 lt_def by auto
 qed
 
+lemma gt_le:
+  fixes b
+  assumes "(\<not> gt b Z)"
+  shows "le b Z"
+  sorry
 
+lemma le_gt:
+  fixes b
+  assumes "(\<not> le b Z)"
+  shows "gt b Z"
+  sorry
+
+lemma lt_ge:
+  fixes b
+  assumes "(\<not> lt b Z)"
+  shows "ge b Z"
+  sorry
+
+lemma triangle_inequality_spivak2:
+  fixes a::r and  b
+  assumes "Nab = abs (a \<oplus> b)" 
+  assumes "Na = abs a" 
+  assumes "Nb = abs b" 
+  shows "le Nab (Na  \<oplus> Nb)" 
+proof (cases "(ge a Z, ge b Z)")
+  case (Pair True False)
+  then show ?thesis sorry
+qed
 
 end
 (* \<odot>  \<oplus> \<in>  \<ominus>  *)
