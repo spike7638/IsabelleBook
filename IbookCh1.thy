@@ -1083,13 +1083,40 @@ lemma gt_le:
   fixes b
   assumes "(\<not> gt b Z)"
   shows "le b Z"
-  sorry
+proof -
+  have 0:  "\<not>((b \<ominus> Z)  \<in> P)" using assms gt_def by simp
+  have 1:  "\<not>((b \<ominus> Z)  \<in> P)" using 0 by simp
+  have 2:  "\<not>(b  \<in> P)" using 1 subtractZ3 by auto
+  have 3: " (neg b) \<in> P \<or> b = Z " using 0 2 trichotomy by auto
+  have 4: " (neg b) = Z \<ominus> b"  using diff_def additive_ident by auto
+  have 5: " Z \<ominus> b \<in> P \<or>  b = Z " using 3 4 diff_def by argo
+  show ?thesis using gt_def 5 le_def lt_def by blast 
+qed
 
 lemma le_gt:
   fixes b
   assumes "(\<not> le b Z)"
   shows "gt b Z"
-  sorry
+proof -
+(* "le a b = (lt a b \<or> a = b)" *)
+  have 0:  "\<not>(lt b Z \<or> b = Z)" using assms le_def lt_def gt_def by auto
+  have 1:  "\<not>(((Z \<ominus> b)  \<in> P) \<and> b = Z)" using 0 lt_def gt_def le_def by auto
+  have 2:  "\<not>( b = Z \<and> ((Z \<ominus> b)  \<in> P))" using 1  by auto
+  have 3:  "\<not>( b = Z \<and> ((neg b)  \<in> P))" using 2 0 negation diff_def by auto
+  have 4: "(b = Z \<and> \<not>( b \<in> P \<or>  (neg b) \<in> P)) \<or>
+  (b \<in> P \<and> \<not>( b = Z \<or>  (neg b) \<in> P)) \<or>
+((neg b) \<in> P \<and> \<not>( b = Z \<or> b \<in> P))" using trichotomy by auto
+  have 5: "b \<in> P" using 3 4
+    using assms gtP1 gt_le by blast
+  then show ?thesis using gtP2 by auto
+qed
+
+(* "(a = Z \<and> \<not>( a \<in> P \<or>  (neg a) \<in> P)) \<or>
+**** (a \<in> P \<and> \<not>( a = Z \<or>  (neg a) \<in> P)) \<or>
+((neg a) \<in> P \<and> \<not>( a = Z \<or> a \<in> P))" *)
+(* "gt a b = ((a \<ominus> b)  \<in> P)" *)
+
+(* "lt a b = gt b a" *)
 
 lemma lt_ge:
   fixes b
