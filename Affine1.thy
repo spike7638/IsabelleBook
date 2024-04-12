@@ -176,6 +176,7 @@ definition "A4QS = {Qa, Sa}"
 definition "A4RS = {Ra, Sa}"
 
 definition "A4Lines = {A4PQ, A4PR, A4PS, A4QR, A4QS, A4RS}"
+
 fun  A4join::"a4pt \<Rightarrow> a4pt \<Rightarrow> a4pt set"  where 
 "A4join x y = (if (x = y) then undefined else {x, y})"
 
@@ -189,12 +190,20 @@ thm A4meets.simps
 thm A4join.simps 
 thm A4Points_def
 
+lemma all_pairs:
+  fixes P::a4pt and Q::a4pt
+  assumes "P \<noteq> Q" 
+  shows "{P, Q} \<in> A4Lines"
+  by (metis (full_types) A4Lines_def A4PQ_def A4PR_def A4PS_def 
+      A4QR_def A4QS_def A4RS_def a4pt.exhaust assms 
+      insert_commute insert_subset subset_insertI)
 
-theorem
+
+lemma xx:
   fixes P Q
   assumes   "P \<noteq> Q" and
- " P \<in> A4Points"  and" Q \<in> A4Points"
-shows "A4join P Q \<in> A4Lines"
+  "P \<in> A4Points"  and" Q \<in> A4Points"
+  shows "A4join P Q \<in> A4Lines"
 proof (cases P)
   case zz:Pa
   then show ?thesis 
@@ -461,18 +470,20 @@ qed
 theorem
   fixes P Q
   assumes   "P \<noteq> Q" and
- " P \<in> A4Points"  and" Q \<in> A4Points"
+  "P \<in> A4Points"  and "Q \<in> A4Points"
 shows "A4meets P (A4join P Q)"
-  using assms by auto
+  using assms A4meets.elims A4join.simps all_pairs by auto
 
 theorem
   fixes P Q
   assumes   "P \<noteq> Q" and
- " P \<in> A4Points"  and" Q \<in> A4Points"
+ " P \<in> A4Points"  and " Q \<in> A4Points"
 shows "A4meets Q (A4join P Q)"
 proof -
-  show ?thesis using assms by auto
+  show ?thesis   
+    using assms A4meets.elims A4join.simps all_pairs by auto
 qed
+
 lemma not_four_and:
   fixes p1 p2 p3 p4
   assumes "\<not> (p1 \<and> p2 \<and> p3 \<and> p4)"
@@ -546,7 +557,8 @@ qed
     proof (intro conjI)
       show "P \<in> A4Points \<Longrightarrow>
     Q \<in> A4Points \<Longrightarrow>
-    A4join P Q \<in> A4Lines" using a0 
+    A4join P Q \<in> A4Lines" using a0 xx by auto
+
 
 
       
