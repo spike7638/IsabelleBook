@@ -199,7 +199,7 @@ lemma all_pairs:
       insert_commute insert_subset subset_insertI)
 
 
-lemma xx:
+lemma all_joins_are_lines:
   fixes P Q
   assumes   "P \<noteq> Q" and
   "P \<in> A4Points"  and" Q \<in> A4Points"
@@ -557,10 +557,33 @@ qed
     proof (intro conjI)
       show "P \<in> A4Points \<Longrightarrow>
     Q \<in> A4Points \<Longrightarrow>
-    A4join P Q \<in> A4Lines" using a0 xx by auto
-
-
-
+    A4join P Q \<in> A4Lines" using a0 all_joins_are_lines by auto
+    next
+      show "P \<in> A4Points \<Longrightarrow> Q \<in> A4Points \<Longrightarrow> A4meets P (A4join P Q)"
+        using a0 all_joins_are_lines by auto
+    next
+      show "P \<in> A4Points \<Longrightarrow> Q \<in> A4Points \<Longrightarrow> A4meets Q (A4join P Q)"
+        using a0 all_joins_are_lines by auto
+    qed
+  qed
+next
+  show "\<And>P Q m.
+       P \<noteq> Q \<Longrightarrow> P \<in> A4Points \<Longrightarrow> Q \<in> A4Points \<Longrightarrow> 
+        A4meets P m \<Longrightarrow> A4meets Q m \<Longrightarrow> m = A4join P Q"
+  proof -
+    fix P::a4pt
+    fix Q::a4pt
+    proof (cases "Pair (P, Q)")
+      case (Pair (Pa, Qa))
+      show " \<And>Pa Qa m a b.
+       Pa \<noteq> Qa \<Longrightarrow>
+       Pa \<in> A4Points \<Longrightarrow>
+       Qa \<in> A4Points \<Longrightarrow>
+       A4meets Pa m \<Longrightarrow>
+       A4meets Qa m \<Longrightarrow> (P, Q) = (a, b) \<Longrightarrow> m = A4join Pa Qa"
+      proof -
+        have 0: 
+    qed
       
 (*
   proof -

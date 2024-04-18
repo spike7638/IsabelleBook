@@ -32,11 +32,12 @@ proof -
   show "11 < 2*n + k" using assms by auto
 qed
 
+
 typedecl r (* proxy for reals *) 
 consts
 plus::"r \<Rightarrow> r \<Rightarrow> r"
 times::"r \<Rightarrow> r \<Rightarrow> r"
-negative::"r \<Rightarrow> r"
+neg::"r \<Rightarrow> r"
 reciprocal::"r \<Rightarrow> r"
 Z :: r (* proxy for zero *)
 U :: r (* proxy for one *)
@@ -96,33 +97,21 @@ qed
 The number zero has one property so important that we list it next:
 
 *)
-lemma plus_ident: (* Spivak calls this P2 *)
+lemma additive_ident: (* Spivak calls this P2 *)
   fixes a::r
   shows "a \<oplus> Z =  a" and "Z \<oplus> a =  a"
   sorry
 
 (* jfh: this is a case where I've put two conclusions in one "shows",
-because I wanted to match Spivak's naming scheme. It may be easier for 
-you to prove this as two separate lemmas, and then make the proof
-of this lemma be "using negation_1 negation_2 by auto" *)
-
+because I wanted to match Spivak's naming scheme *)
 (* 
 An important role is also played by 0 in the third property of our list:
 *)
 lemma negation: (* Spivak calls this P3 *)
   fixes a::r
-  shows "a \<oplus> (negative a) =  Z"
-  and  "(negative a) \<oplus> a =  Z"
+  shows "a \<oplus> (neg a) =  Z"
+  and  "(neg a) \<oplus> a =  Z"
   sorry
-
-(* ================================
-The remainder of this document is mostly duplicated in Ch1-Exercises.thy, where you, the
-reader, are asked to fill in various lemmas and proofs. What's left here is my own 
-version of that work, which you can look at if you become deeply frustrated by doing 
-those exercises. You should switch to that file and start working through these 
-exercises for yourself. 
-==================================== *)
-
 
 (*
 Property P3 ought to represent a distinguishing characteristic of the
@@ -146,11 +135,11 @@ lemma ex2:
   assumes "a \<oplus> x =  a"
   shows "x =  Z"
 proof -
-  have 0: "(negative a) \<oplus> (a \<oplus> x) = ((negative a) \<oplus> a)" using assms by auto
-  have 1: "(negative a) \<oplus> (a \<oplus> x) = Z"  using 0 negation by auto
-  have 2: "((negative a)\<oplus> a) \<oplus> x = Z" using 1 plus_assoc by auto
+  have 0: "(neg a) \<oplus> (a \<oplus> x) = ((neg a) \<oplus> a)" using assms by auto
+  have 1: "(neg a) \<oplus> (a \<oplus> x) = Z"  using 0 negation by auto
+  have 2: "((neg a)\<oplus> a) \<oplus> x = Z" using 1 plus_assoc by auto
   have 3: "Z \<oplus> x = Z" using 2 negation by auto
-  show ?thesis using 3 plus_ident by auto
+  show ?thesis using 3 additive_ident by auto
 qed
 
 (* As we have just hinted, it is convenient to regard 
@@ -159,15 +148,10 @@ a - b to be an abbreviation for a + (-b).
 *)
 
 definition diff:: "r \<Rightarrow> r \<Rightarrow> r" where
-"diff a b \<equiv> (a \<oplus> (negative b))"
+"diff a b \<equiv> (a \<oplus> (neg b))"
 
-notation diff (infix "\<ominus>" 80) 
-(* jfh: when you define diff like this, a new 'fact' is introduced on your
-behalf, called "diff_def". There isn't a "negative_def" because we didn't actaully give
-a definition of negation -- we just asserted a few properties that it has. So we have to cite
-THOSE, rather than the definition, when we need them. We'll also define less-than, greater-than-
-or-equal, etc. a bit later, and often use "lt_def", for example, in the course of a proof. 
-*)
+notation diff  (infix "\<ominus>" 80) 
+
 (*
 It is then possible to find
 the solutions to certain simple equations by a serious of steps
@@ -182,7 +166,7 @@ for the equation a + x = a. For example
 
 (*
 Naturally, such elaborate solutions are of interest only until you
-become convinced that they can always be supplied. In practice, it is
+become convinced that they can always be supplied. in practice, it is
 usually just a waste of time to solve an equation by indicating so 
 explicitly the reliance on properties P1, P2, and P3 (or any of
 the further properties we shall list).
@@ -201,11 +185,11 @@ lemma ex3:
 
 proof -
   have 0: "x \<oplus> a = b" using assms by auto
-  have 1: "(x \<oplus> a) \<oplus> (negative a) = b \<oplus> (negative a)" using 0 by auto
-  have 2: "(x \<oplus> a) \<oplus> (negative a) = x \<oplus> (a \<oplus> (negative a))" using plus_assoc by auto
-  have 3: "x \<oplus> (a \<oplus> (negative a)) = b \<oplus> (negative a)" using 1 2 by auto
-  have 4: "x \<oplus> Z = b \<oplus> (negative a)" using 3 negation(1) by auto
-  have 5: "x = b \<oplus> (negative a)" using 4 plus_ident(1) by auto
+  have 1: "(x \<oplus> a) \<oplus> (neg a) = b \<oplus> (neg a)" using 0 by auto
+  have 2: "(x \<oplus> a) \<oplus> (neg a) = x \<oplus> (a \<oplus> (neg a))" using plus_assoc by auto
+  have 3: "x \<oplus> (a \<oplus> (neg a)) = b \<oplus> (neg a)" using 1 2 by auto
+  have 4: "x \<oplus> Z = b \<oplus> (neg a)" using 3 negation(1) by auto
+  have 5: "x = b \<oplus> (neg a)" using 4 additive_ident(1) by auto
   show ?thesis using 5 diff_def by auto
 qed
 
@@ -309,7 +293,7 @@ in terms of multiplication: the symbol a/b means a \<cdot> b^{-1}. Since
 *)
 
 (*jfh: This is a place where Isabelle and other proof assistants diverge
-from conventional mathematical practice. They actually DO define the 
+from conventional mathematical practice. They actually define the 
 multiplicative inverse as a function on ALL real numbers. But they
 assert nothing about the value of 0^{-1} -- so nothing can be proved 
 about it. This takes some getting used to. We use the "reciprocal" 
@@ -336,7 +320,7 @@ if an inverse for 0 is 'defined' ... if it cannot be used for anything!
 
 lemma ex6: 
   fixes a::r and b and c
-  assumes "a \<odot> b = a \<odot> c" and "a \<noteq> Z"
+  assumes "a \<odot> b = a  \<odot> c" and "a \<noteq> Z"
   shows "b = c"
 proof -
   have 0: "a \<odot> b = a  \<odot> c" using assms by auto
@@ -372,7 +356,7 @@ lemma ex7a:
   fixes a::r
   shows "a \<odot> Z = Z"
 proof -
-  have 0: "Z \<oplus> Z = Z" using plus_ident by auto
+  have 0: "Z \<oplus> Z = Z" using additive_ident by auto
   have 1: " a \<odot> (Z \<oplus> Z) = a \<odot> Z" using 0 by auto
   have 2: " (a \<odot> Z) \<oplus> (a \<odot> Z) = a \<odot> Z" using 1 distrib by auto
   show ?thesis  using 2 ex2 by blast
@@ -397,94 +381,81 @@ next
   then show ?thesis using 4 by auto
 qed
 
-(* jfh: there are a bunch more properties that I found myself using (and proving!)
-more than once in subsequent parts of this document, so I separated them out
-into lemmas, things like  x * 0 = 0 and 0 * x = 0, and -(-x) = x, and if 
-x + y = 0, then y = -x (i.e., there's only one thing which, when added to
-x gives us zero; our 'axiom" says that there's at least one, called "negative x", 
-but this lemma shows it's unique). Also:
-(-a) * b = -(a*b)
-(-a) * (-b) = a*b
--0 = 0
-a - 0 = a + (-0)
-a - 0 = a + 0
-a - 0 = a
-
-*)
+ 
 
 lemma mulZ: 
   fixes a
   shows "(a  \<odot> Z) = Z" and "(Z  \<odot> a) = Z"
 proof -
-  have 0:"Z  \<oplus> Z = Z" using plus_ident by auto
+  have 0:"Z  \<oplus> Z = Z" using additive_ident by auto
   have 1: "a  \<odot> (Z \<oplus> Z) = (a  \<odot> Z)" using 0 by auto
   have 2: "(a  \<odot> Z) \<oplus> (a  \<odot> Z) = (a  \<odot> Z)" using 1 distrib by auto
-  have 3: "((a  \<odot> Z) \<oplus> (a  \<odot> Z)) \<oplus> (negative (a  \<odot> Z))  = (a  \<odot> Z)  \<oplus> (negative (a  \<odot> Z))" 
+  have 3: "((a  \<odot> Z) \<oplus> (a  \<odot> Z)) \<oplus> (neg (a  \<odot> Z))  = (a  \<odot> Z)  \<oplus> (neg (a  \<odot> Z))" 
     using 2 by auto
-  have 4: "(a  \<odot> Z) \<oplus> ((a  \<odot> Z) \<oplus> (negative (a  \<odot> Z)))  = Z" 
+  have 4: "(a  \<odot> Z) \<oplus> ((a  \<odot> Z) \<oplus> (neg (a  \<odot> Z)))  = Z" 
     using 3 plus_assoc negation by auto
   have 5: "(a  \<odot> Z) \<oplus> (Z)  = Z" 
     using 4 negation by auto
   show 6:"(a  \<odot> Z)  = Z" 
-    using 5 plus_ident by auto
+    using 5 additive_ident by auto
   show 7:"(Z  \<odot> a)  = Z" using 6 mul_commute by auto
 qed
 
-lemma unique_negative:
+lemma unique_neg:
   fixes a b
   assumes "u  \<oplus> x = Z"
-  shows "x = negative u"
+  shows "x = neg u"
 proof -
   have 0:  "u  \<oplus> x = Z" using assms by auto
-  have 1: "(negative u)  \<oplus> (u  \<oplus> x) = (negative u)  \<oplus> Z" using 0 by auto
-  have 2: "((negative u)  \<oplus> u)  \<oplus> x = (negative u)" 
-    using 1 plus_ident plus_assoc by auto
-  have 3: "Z  \<oplus> x = (negative u)" using 2 negation by auto
-  thus ?thesis using plus_ident 3 by auto
+  have 1: "(neg u)  \<oplus> (u  \<oplus> x) = (neg u)  \<oplus> Z" using 0 by auto
+  have 2: "((neg u)  \<oplus> u)  \<oplus> x = (neg u)" 
+    using 1 additive_ident plus_assoc by auto
+  have 3: "Z  \<oplus> x = (neg u)" using 2 negation by auto
+  thus ?thesis using additive_ident 3 by auto
 qed
 
-lemma move_negative: 
+lemma move_neg: 
   fixes a b
-  shows "(negative a)  \<odot> b = negative (a  \<odot> b)"
+  shows "(neg a)  \<odot> b = neg(a  \<odot> b)"
 proof -
-  have 0:"((negative a)  \<odot> b) \<oplus> (a  \<odot> b) = (b  \<odot> (negative a)) \<oplus> (b  \<odot> a)" using mul_commute by auto
-  have 1:"((negative a)  \<odot> b) \<oplus> (a  \<odot> b) = (b  \<odot> ((negative a) \<oplus> a))" using 0 distrib by auto
-  have 2:"((negative a)  \<odot> b) \<oplus> (a  \<odot> b) = (b  \<odot> Z)" using 1 negation by auto
-  have 3:"((negative a)  \<odot> b) \<oplus> (a  \<odot> b) = Z" using 2 mulZ by auto
-  have 4: " (a  \<odot> b) \<oplus> ((negative a)  \<odot> b) = Z" using 3 plus_commute by auto
-  show ?thesis  using 4 unique_negative  by auto
+  have 0:"((neg a)  \<odot> b) \<oplus> (a  \<odot> b) = (b  \<odot> (neg a)) \<oplus> (b  \<odot> a)" using mul_commute by auto
+  have 1:"((neg a)  \<odot> b) \<oplus> (a  \<odot> b) = (b  \<odot> ((neg a) \<oplus> a))" using 0 distrib by auto
+  have 2:"((neg a)  \<odot> b) \<oplus> (a  \<odot> b) = (b  \<odot> Z)" using 1 negation by auto
+  have 3:"((neg a)  \<odot> b) \<oplus> (a  \<odot> b) = Z" using 2 mulZ by auto
+  have 4: " (a  \<odot> b) \<oplus> ((neg a)  \<odot> b) = Z" using 3 plus_commute by auto
+  show ?thesis  using 4 unique_neg  by auto
 qed
 
-lemma negative_product: 
+lemma neg_product: 
   fixes a b
-  shows "(negative a)  \<odot> (negative b) = a  \<odot> b"
+  shows "(neg a)  \<odot> (neg b) = a  \<odot> b"
 proof -
-  have 0: "((negative a)  \<odot> (negative b)) \<oplus> negative (a  \<odot> b) = ((negative a)  \<odot> (negative b))  \<oplus> (negative (a)  \<odot> b)" 
-    using move_negative by auto
-  have 1: "((negative a)  \<odot> (negative b)) \<oplus> negative (a  \<odot> b) = ((negative a)  \<odot> ((negative b)  \<oplus>  b))" using 0 distrib by auto 
-  have 2: "((negative a)  \<odot> (negative b)) \<oplus> negative (a  \<odot> b) = (negative a)  \<odot> Z" using 1 negation by auto 
-  have 3: "((negative a)  \<odot> (negative b)) \<oplus> negative (a  \<odot> b) =  Z" using 2 mulZ by auto
-  have 4: "(((negative a)  \<odot> (negative b)) \<oplus> negative (a  \<odot> b)) \<oplus> (a  \<odot> b) =  Z  \<oplus> (a  \<odot> b)" using 3 by auto
-  have 5: "((negative a)  \<odot> (negative b)) \<oplus> (negative (a  \<odot> b) \<oplus> (a  \<odot> b)) =  (a  \<odot> b)" 
-    using 4 plus_assoc plus_ident by auto
-  have 6: "((negative a)  \<odot> (negative b)) \<oplus> Z =  (a  \<odot> b)" 
+  have 0: "((neg a)  \<odot> (neg b)) \<oplus> neg(a  \<odot> b) = ((neg a)  \<odot> (neg b))  \<oplus> (neg(a)  \<odot> b)" 
+    using move_neg by auto
+  have 1: "((neg a)  \<odot> (neg b)) \<oplus> neg(a  \<odot> b) = ((neg a)  \<odot> ((neg b)  \<oplus>  b))" using 0 distrib by auto 
+  have 2: "((neg a)  \<odot> (neg b)) \<oplus> neg(a  \<odot> b) = (neg a)  \<odot> Z" using 1 negation by auto 
+  have 3: "((neg a)  \<odot> (neg b)) \<oplus> neg(a  \<odot> b) =  Z" using 2 mulZ by auto
+  have 4: "(((neg a)  \<odot> (neg b)) \<oplus> neg(a  \<odot> b)) \<oplus> (a  \<odot> b) =  Z  \<oplus> (a  \<odot> b)" using 3 by auto
+  have 5: "((neg a)  \<odot> (neg b)) \<oplus> (neg(a  \<odot> b) \<oplus> (a  \<odot> b)) =  (a  \<odot> b)" 
+    using 4 plus_assoc additive_ident by auto
+  have 6: "((neg a)  \<odot> (neg b)) \<oplus> Z =  (a  \<odot> b)" 
     using 5 negation by auto
   show ?thesis 
-    using 6 plus_ident by auto
+    using 6 additive_ident by auto
 qed
 
 (* A few more warmup lemmas *)
 
 lemma negZ:
-  shows "negative Z = Z"
-(*hint: Z + (negative Z) = Z; does a prior lemma then help? *)
+  shows "neg Z = Z"
+(*hint: Z + (neg Z) = Z; does a prior lemma then help? *)
 proof -
-  have 0: "Z  \<oplus> (negative Z) = Z" using negation by auto
+  have 0: "Z  \<oplus> (neg Z) = Z" using negation by auto
   show ?thesis using 0 ex2 by auto
 qed
 
 lemma subtractZ:
-  shows "a \<ominus> Z = a  \<oplus> (negative Z)"
+  shows "a \<ominus> Z = a  \<oplus> (neg Z)"
 proof -
   show ?thesis using diff_def by auto
 qed
@@ -498,7 +469,7 @@ qed
 lemma subtractZ3:
   shows "a \<ominus> Z = a"
 proof -
-  show ?thesis using subtractZ2 plus_ident by auto
+  show ?thesis using subtractZ2 additive_ident by auto
 qed
 
 (* Additional material to get you started on positive and negative
@@ -508,9 +479,9 @@ P::"r set"
 
 lemma trichotomy: (* Spivak's P10 *)
   fixes a
-  shows "(a = Z \<and> \<not>( a \<in> P \<or>  (negative a) \<in> P)) \<or>
-(a \<in> P \<and> \<not>( a = Z \<or>  (negative a) \<in> P)) \<or>
-((negative a) \<in> P \<and> \<not>( a = Z \<or> a \<in> P))"
+  shows "(a = Z \<and> \<not>( a \<in> P \<or>  (neg a) \<in> P)) \<or>
+(a \<in> P \<and> \<not>( a = Z \<or>  (neg a) \<in> P)) \<or>
+((neg a) \<in> P \<and> \<not>( a = Z \<or> a \<in> P))"
   sorry
 
 lemma additive_closure: (*Spivak's P11 *)
@@ -524,12 +495,6 @@ lemma multiplicative_closure: (*Spivak's P12 *)
   assumes "a \<in> P" and "b \<in> P"
   shows "a \<odot> b \<in> P"
   sorry
-
-(* I've defined greater-than, greater-than-or-equal, less-than, less-than-or-equal, but
-I didn't make 'infix' notation for them; on reflection perhaps I should have. 
-Regardless, I rapidly found myself wanting to say things like a > 0 means a is in the set P, 
-and NOT(a > 0) is the same as (a \<le> 0). So there are a bunch of lemmas to help out. 
-You get to prove them all. *)
 
 definition gt::"r \<Rightarrow> r \<Rightarrow> bool"
   where "gt a b = ((a \<ominus> b)  \<in> P)" 
@@ -561,9 +526,9 @@ qed
 
 lemma trichotomy2: 
   fixes a b
-  shows "(a \<ominus> b = Z \<and> \<not>( a \<ominus> b \<in> P \<or>  (negative (a \<ominus> b)) \<in> P)) \<or>
-(a \<ominus> b \<in> P \<and> \<not>( a \<ominus> b = Z \<or>  (negative (a \<ominus> b)) \<in> P)) \<or>
-((negative (a \<ominus> b)) \<in> P \<and> \<not>( a \<ominus> b = Z \<or> a \<ominus> b \<in> P))"
+  shows "(a \<ominus> b = Z \<and> \<not>( a \<ominus> b \<in> P \<or>  (neg (a \<ominus> b)) \<in> P)) \<or>
+(a \<ominus> b \<in> P \<and> \<not>( a \<ominus> b = Z \<or>  (neg (a \<ominus> b)) \<in> P)) \<or>
+((neg (a \<ominus> b)) \<in> P \<and> \<not>( a \<ominus> b = Z \<or> a \<ominus> b \<in> P))"
 proof -
   show ?thesis using trichotomy by auto
 qed
@@ -573,11 +538,11 @@ lemma help1:
   assumes "a \<ominus> b = Z"
   shows "a = b"
 proof -
-  have 0:"a \<oplus> (negative b) = Z" using diff_def assms by auto
-  have 1:"(a \<oplus> (negative b)) \<oplus>  b = Z  \<oplus>  b" using 0  by auto
-  have 2:"a \<oplus> ((negative b)\<oplus>  b ) = Z  \<oplus>  b" using 1 plus_assoc by auto
+  have 0:"a \<oplus> (neg b) = Z" using diff_def assms by auto
+  have 1:"(a \<oplus> (neg b)) \<oplus>  b = Z  \<oplus>  b" using 0  by auto
+  have 2:"a \<oplus> ((neg b)\<oplus>  b ) = Z  \<oplus>  b" using 1 plus_assoc by auto
   have 3:"a \<oplus> Z  = Z  \<oplus>  b" using 2 negation by auto
-  show ?thesis using 3 plus_ident by auto
+  show ?thesis using 3 additive_ident by auto
 qed
 
 lemma help2: 
@@ -590,31 +555,31 @@ qed
 
 lemma negsub:
   fixes a b
-  shows "b \<ominus> a = negative (a \<ominus> b)"
+  shows "b \<ominus> a = neg(a \<ominus> b)"
 proof -
-  have 0: "(b \<ominus> a)  \<oplus> (a \<ominus> b) = (b \<oplus> (negative a))  \<oplus> (a \<oplus> (negative b))"
+  have 0: "(b \<ominus> a)  \<oplus> (a \<ominus> b) = (b \<oplus> (neg a))  \<oplus> (a \<oplus> (neg b))"
     using diff_def by auto
-  have 1: "(b \<ominus> a)  \<oplus> (a \<ominus> b) = ((b \<oplus> (negative a))  \<oplus> a) \<oplus> (negative b)"
+  have 1: "(b \<ominus> a)  \<oplus> (a \<ominus> b) = ((b \<oplus> (neg a))  \<oplus> a) \<oplus> (neg b)"
     using 0 plus_assoc by auto
-  have 2: "(b \<ominus> a)  \<oplus> (a \<ominus> b) = (b \<oplus> ((negative a)  \<oplus> a)) \<oplus> (negative b)"
+  have 2: "(b \<ominus> a)  \<oplus> (a \<ominus> b) = (b \<oplus> ((neg a)  \<oplus> a)) \<oplus> (neg b)"
     using 1 plus_assoc by auto
-  have 3: "(b \<ominus> a)  \<oplus> (a \<ominus> b) = (b \<oplus> Z) \<oplus> (negative b)"
+  have 3: "(b \<ominus> a)  \<oplus> (a \<ominus> b) = (b \<oplus> Z) \<oplus> (neg b)"
     using 2 negation by auto
-  have 4: "(b \<ominus> a)  \<oplus> (a \<ominus> b) = (b ) \<oplus> (negative b)"
-    using 3 plus_ident by auto
+  have 4: "(b \<ominus> a)  \<oplus> (a \<ominus> b) = (b ) \<oplus> (neg b)"
+    using 3 additive_ident by auto
   have 5: "(b \<ominus> a)  \<oplus> (a \<ominus> b) = Z"
     using 4 negation by auto
   have 6: "(a \<ominus> b)  \<oplus> (b \<ominus> a) = Z"
     using 5 plus_commute by auto
-  show ?thesis using 6 unique_negative by auto
+  show ?thesis using 6 unique_neg by auto
 qed
 
 lemma help3: 
   fixes a b
-  assumes "(negative (a \<ominus> b)) \<in> P"
+  assumes "(neg (a \<ominus> b)) \<in> P"
   shows "gt b a"
 proof -
-  have 0: "negative (a \<ominus> b) = b \<ominus> a" using  negsub by metis
+  have 0: "neg(a \<ominus> b) = b \<ominus> a" using  negsub by metis
   have 1: "b \<ominus> a \<in> P" using assms 0 by auto
   show ?thesis using 1 gt_def by auto 
 qed
@@ -623,17 +588,17 @@ qed
 lemma help3b: 
   fixes a b
   assumes "gt b a"
-  shows "(negative (a \<ominus> b)) \<in> P"
+  shows "(neg (a \<ominus> b)) \<in> P"
 proof -
   have 0: "b \<ominus> a \<in> P" using assms gt_def by auto
-  have 1: "negative (a \<ominus> b) = b \<ominus> a" using  negsub by metis
-  have 2: "negative (a \<ominus> b) \<in> P" using 0 1  by auto
+  have 1: "neg(a \<ominus> b) = b \<ominus> a" using  negsub by metis
+  have 2: "neg(a \<ominus> b) \<in> P" using 0 1  by auto
   show ?thesis using 2 gt_def by auto 
 qed
 
 lemma help3c:
   fixes a b
-  shows "gt b a = ((negative (a \<ominus> b)) \<in> P)"
+  shows "gt b a = ((neg (a \<ominus> b)) \<in> P)"
 proof -
   show ?thesis using help3 help3b by auto
 qed
@@ -645,27 +610,27 @@ lemma trichotomy3:
 (h2 \<and> \<not>( h1 \<or> h3)) \<or> 
 (h3 \<and> \<not>( h1 \<or> h2))"
 proof -
-  have 0: "(a \<ominus> b = Z \<and> \<not>( a \<ominus> b \<in> P \<or>  (negative (a \<ominus> b)) \<in> P)) \<or>
-(a \<ominus> b \<in> P \<and> \<not>( a \<ominus> b = Z \<or>  (negative (a \<ominus> b)) \<in> P)) \<or>
-((negative (a \<ominus> b)) \<in> P \<and> \<not>( a \<ominus> b = Z \<or> a \<ominus> b \<in> P))" using  trichotomy2 assms by auto
-  have 1: "(a = b \<and> \<not>( a \<ominus> b \<in> P \<or>  (negative (a \<ominus> b)) \<in> P)) \<or>
-(a \<ominus> b \<in> P \<and> \<not>( a \<ominus> b = Z \<or>  (negative (a \<ominus> b)) \<in> P)) \<or>
-((negative (a \<ominus> b)) \<in> P \<and> \<not>(  a \<ominus> b = Z \<or> a \<ominus> b \<in> P))" 
+  have 0: "(a \<ominus> b = Z \<and> \<not>( a \<ominus> b \<in> P \<or>  (neg (a \<ominus> b)) \<in> P)) \<or>
+(a \<ominus> b \<in> P \<and> \<not>( a \<ominus> b = Z \<or>  (neg (a \<ominus> b)) \<in> P)) \<or>
+((neg (a \<ominus> b)) \<in> P \<and> \<not>( a \<ominus> b = Z \<or> a \<ominus> b \<in> P))" using  trichotomy2 assms by auto
+  have 1: "(a = b \<and> \<not>( a \<ominus> b \<in> P \<or>  (neg (a \<ominus> b)) \<in> P)) \<or>
+(a \<ominus> b \<in> P \<and> \<not>( a \<ominus> b = Z \<or>  (neg (a \<ominus> b)) \<in> P)) \<or>
+((neg (a \<ominus> b)) \<in> P \<and> \<not>(  a \<ominus> b = Z \<or> a \<ominus> b \<in> P))" 
     using  0 help1 by auto
-  have 2: "(a = b \<and> \<not>( a \<ominus> b \<in> P \<or>  (negative (a \<ominus> b)) \<in> P)) \<or>
-(a \<ominus> b \<in> P \<and> \<not>( (a = b) \<or>  (negative (a \<ominus> b)) \<in> P)) \<or>
-((negative (a \<ominus> b)) \<in> P \<and> \<not>(  (a = b) \<or> a \<ominus> b \<in> P))" 
+  have 2: "(a = b \<and> \<not>( a \<ominus> b \<in> P \<or>  (neg (a \<ominus> b)) \<in> P)) \<or>
+(a \<ominus> b \<in> P \<and> \<not>( (a = b) \<or>  (neg (a \<ominus> b)) \<in> P)) \<or>
+((neg (a \<ominus> b)) \<in> P \<and> \<not>(  (a = b) \<or> a \<ominus> b \<in> P))" 
     using  1 help1 by (metis negsub)
-  have 3: "(h1 \<and> \<not>( a \<ominus> b \<in> P \<or>  (negative (a \<ominus> b)) \<in> P)) \<or>
-(a \<ominus> b \<in> P \<and> \<not>( h1 \<or>  (negative (a \<ominus> b)) \<in> P)) \<or>
-((negative (a \<ominus> b)) \<in> P \<and> \<not>( h1 \<or> a \<ominus> b \<in> P))" 
+  have 3: "(h1 \<and> \<not>( a \<ominus> b \<in> P \<or>  (neg (a \<ominus> b)) \<in> P)) \<or>
+(a \<ominus> b \<in> P \<and> \<not>( h1 \<or>  (neg (a \<ominus> b)) \<in> P)) \<or>
+((neg (a \<ominus> b)) \<in> P \<and> \<not>( h1 \<or> a \<ominus> b \<in> P))" 
     using  2 assms(1) by auto
   have 4: " a \<ominus> b \<in> P = gt a b" using gt_def by auto
-  have 5: "(h1 \<and> \<not>(gt a b \<or>  (negative (a \<ominus> b)) \<in> P)) \<or>
-(gt a b \<and> \<not>( h1 \<or>  (negative (a \<ominus> b)) \<in> P)) \<or>
-((negative (a \<ominus> b)) \<in> P \<and> \<not>( h1 \<or> gt a b))" 
+  have 5: "(h1 \<and> \<not>(gt a b \<or>  (neg (a \<ominus> b)) \<in> P)) \<or>
+(gt a b \<and> \<not>( h1 \<or>  (neg (a \<ominus> b)) \<in> P)) \<or>
+((neg (a \<ominus> b)) \<in> P \<and> \<not>( h1 \<or> gt a b))" 
     using  3 4 by auto 
-  have 6 :"(negative (a \<ominus> b) \<in> P) = h3" using help3c assms by auto
+  have 6 :"(neg (a \<ominus> b) \<in> P) = h3" using help3c assms by auto
   have 7 :"(h1 \<and> \<not>(gt a b \<or> h3)) \<or>
 (gt a b \<and> \<not>( h1 \<or>  h3)) \<or>
 (h3 \<and> \<not>( h1 \<or> gt a b))"  using 5 6 by auto
@@ -676,52 +641,53 @@ qed
 
 lemma neg_sum:
   fixes a b
-  shows "negative (a  \<oplus> c) = (negative a)  \<oplus> (negative c)"
+  shows "neg (a  \<oplus> c) = (neg a)  \<oplus> (neg c)"
 proof -
-  have 0: "(a  \<oplus> c) \<oplus> ( (negative a)  \<oplus> (negative c)) = Z" 
+  have 0: "(a  \<oplus> c) \<oplus> ( (neg a)  \<oplus> (neg c)) = Z" 
   proof -
-    have 1: "(a  \<oplus> c) \<oplus> ( (negative a)  \<oplus> (negative c)) = ((a  \<oplus> c) \<oplus>  (negative a))  \<oplus> (negative c)"
+    have 1: "(a  \<oplus> c) \<oplus> ( (neg a)  \<oplus> (neg c)) = ((a  \<oplus> c) \<oplus>  (neg a))  \<oplus> (neg c)"
       using plus_assoc  by auto
-    have 2: "(a  \<oplus> c) \<oplus> ( (negative a)  \<oplus> (negative c)) = (a  \<oplus> (c \<oplus>  (negative a)))  \<oplus> (negative c)"
+    have 2: "(a  \<oplus> c) \<oplus> ( (neg a)  \<oplus> (neg c)) = (a  \<oplus> (c \<oplus>  (neg a)))  \<oplus> (neg c)"
       using plus_assoc 1  by auto
-    have 3: "(a  \<oplus> c) \<oplus> ( (negative a)  \<oplus> (negative c)) = (a  \<oplus> ((negative a) \<oplus> c))  \<oplus> (negative c)"
+    have 3: "(a  \<oplus> c) \<oplus> ( (neg a)  \<oplus> (neg c)) = (a  \<oplus> ((neg a) \<oplus> c))  \<oplus> (neg c)"
       using plus_commute 2  by auto
-    have 4: "(a  \<oplus> c) \<oplus> ( (negative a)  \<oplus> (negative c)) = ((a  \<oplus> (negative a)) \<oplus> c)  \<oplus> (negative c)"
+    have 4: "(a  \<oplus> c) \<oplus> ( (neg a)  \<oplus> (neg c)) = ((a  \<oplus> (neg a)) \<oplus> c)  \<oplus> (neg c)"
       using plus_assoc 3  by auto
-    have 5: "(a  \<oplus> c) \<oplus> ( (negative a)  \<oplus> (negative c)) = (Z \<oplus> c)  \<oplus> (negative c)"
+    have 5: "(a  \<oplus> c) \<oplus> ( (neg a)  \<oplus> (neg c)) = (Z \<oplus> c)  \<oplus> (neg c)"
       using  negation 4  by auto
-    have 6: "(a  \<oplus> c) \<oplus> ( (negative a)  \<oplus> (negative c)) = Z \<oplus> (c  \<oplus> (negative c))"
+    have 6: "(a  \<oplus> c) \<oplus> ( (neg a)  \<oplus> (neg c)) = Z \<oplus> (c  \<oplus> (neg c))"
       using  plus_assoc 5  by auto
-    have 7: "(a  \<oplus> c) \<oplus> ( (negative a)  \<oplus> (negative c)) = Z \<oplus> Z"
+    have 7: "(a  \<oplus> c) \<oplus> ( (neg a)  \<oplus> (neg c)) = Z \<oplus> Z"
       using  negation 6  by auto
     show ?thesis
-      using  plus_ident 7  by auto
+      using  additive_ident 7  by auto
   qed
-  show ?thesis using 0 unique_negative by auto 
+  show ?thesis using 0 unique_neg by auto 
 qed
 
-(* jfh: this is the result Spivak describes as "slightly more interesting" 
-near the end of the material before the traingle inequality *)
+thm lt_def
+thm gt_def
+
 lemma slightly_more_interesting:
   fixes a b c
   assumes "lt a b"
   shows "lt (a  \<oplus> c) (b  \<oplus> c)"
 proof -
   have 0:"(b  \<ominus> a) \<in> P" using assms lt_def gt_def by auto
-  have 1: "b  \<oplus> (negative a) \<in> P" using 0 diff_def by auto
-  have 2: "(b  \<oplus> (negative a))  \<oplus> (c  \<oplus> (negative c)) \<in> P" 
-    using 1 negation plus_ident by auto
-  have 3: "((b  \<oplus> (negative a))  \<oplus> c)  \<oplus> (negative c) \<in> P" 
+  have 1: "b  \<oplus> (neg a) \<in> P" using 0 diff_def by auto
+  have 2: "(b  \<oplus> (neg a))  \<oplus> (c  \<oplus> (neg c)) \<in> P" 
+    using 1 negation additive_ident by auto
+  have 3: "((b  \<oplus> (neg a))  \<oplus> c)  \<oplus> (neg c) \<in> P" 
     using  2 plus_assoc by auto
-  have 4: "(b  \<oplus> ((negative a)  \<oplus> c))  \<oplus> (negative c) \<in> P" 
+  have 4: "(b  \<oplus> ((neg a)  \<oplus> c))  \<oplus> (neg c) \<in> P" 
     using  3 plus_assoc by auto
-  have 5: "(b  \<oplus> (c  \<oplus> (negative a)))  \<oplus> (negative c) \<in> P" 
+  have 5: "(b  \<oplus> (c  \<oplus> (neg a)))  \<oplus> (neg c) \<in> P" 
     using 4 plus_commute by auto
-  have 6: "((b  \<oplus> c)  \<oplus> (negative a))  \<oplus> (negative c) \<in> P" 
+  have 6: "((b  \<oplus> c)  \<oplus> (neg a))  \<oplus> (neg c) \<in> P" 
     using 5 plus_assoc by auto
-  have 7: "(b  \<oplus> c)  \<oplus> ((negative a)  \<oplus> (negative c)) \<in> P" 
+  have 7: "(b  \<oplus> c)  \<oplus> ((neg a)  \<oplus> (neg c)) \<in> P" 
     using 6 plus_assoc by auto
-  have 8: "(b  \<oplus> c)  \<oplus> (negative (a  \<oplus> c)) \<in> P" 
+  have 8: "(b  \<oplus> c)  \<oplus> (neg (a  \<oplus> c)) \<in> P" 
     using 7 neg_sum by auto
   have 9: "(b  \<oplus> c)  \<ominus>  (a  \<oplus> c)   \<in> P" 
     using 8 diff_def by auto
@@ -736,16 +702,15 @@ proof -
   have 0:"(b  \<ominus> a) \<in> P" using assms(1) lt_def gt_def by auto
   have 1:"(c  \<ominus> b) \<in> P" using assms(2) lt_def gt_def by auto
   have 2:"(c  \<ominus> b)  \<oplus> (b  \<ominus> a) \<in> P" using 0 1 additive_closure by auto
-  have 3:"(c  \<oplus> (negative b))  \<oplus> (b   \<oplus> (negative a)) \<in> P" using 2 diff_def by auto
-  have 4:"c  \<oplus> ((negative b)  \<oplus> (b   \<oplus> (negative a))) \<in> P" using 3 plus_assoc by auto
-  have 5:"c  \<oplus> (((negative b)  \<oplus> b)   \<oplus> (negative a)) \<in> P" using 4 plus_assoc by auto
-  have 6:"c  \<oplus> (Z   \<oplus> (negative a)) \<in> P" using 5 negation by auto
-  have 7:"c  \<oplus> (negative a) \<in> P" using 6 plus_ident by auto
+  have 3:"(c  \<oplus> (neg b))  \<oplus> (b   \<oplus> (neg a)) \<in> P" using 2 diff_def by auto
+  have 4:"c  \<oplus> ((neg b)  \<oplus> (b   \<oplus> (neg a))) \<in> P" using 3 plus_assoc by auto
+  have 5:"c  \<oplus> (((neg b)  \<oplus> b)   \<oplus> (neg a)) \<in> P" using 4 plus_assoc by auto
+  have 6:"c  \<oplus> (Z   \<oplus> (neg a)) \<in> P" using 5 negation by auto
+  have 7:"c  \<oplus> (neg a) \<in> P" using 6 additive_ident by auto
   have 8:"(c  \<ominus> a) \<in> P" using 7 diff_def by auto
   show ?thesis using 8 lt_def gt_def by auto
 qed
 
-(* This is my shorthand for the "nonnegative" numbers, hence NN *)
 definition NN where "NN = P \<union> {Z}"
 
 lemma NN_closure:
@@ -756,7 +721,7 @@ lemma NN_closure:
   shows "a  \<oplus> b  \<in>  NN"
 proof (cases "a = Z")
   case True
-  have 0: "a  \<oplus> b = b" using True plus_ident by auto
+  have 0: "a  \<oplus> b = b" using True additive_ident by auto
   have 1: "b  \<in>  NN" using assms by auto
   then show ?thesis using 0 1 by auto
 next
@@ -766,7 +731,7 @@ next
   then show ?thesis 
   proof (cases "b = Z")
     case True
-    have 1: "a  \<oplus> b = a"  using True plus_ident by auto
+    have 1: "a  \<oplus> b = a"  using True additive_ident by auto
     have 2: "a  \<oplus> b \<in> P" using 1 aPos by auto
     then show ?thesis using 2 assms NN_def by auto
   next
@@ -797,11 +762,11 @@ lemma ge_NN:
 proof -
   have 01:"a  \<ominus> b  \<in>  NN" using assms(1) by auto
   have 02:"(a  \<ominus> b) \<in> P \<or> (a  \<ominus> b) = Z" using 01 NN_def by auto 
-  have 03:"(a  \<ominus> b) \<in> P \<or> (a \<oplus> negative b) = Z" using 02  diff_def negation by auto
-  have 04:"(a  \<ominus> b) \<in> P \<or> (a \<oplus> negative b)\<oplus> b = Z\<oplus> b" using 03  by auto
-  have 05:"(a  \<ominus> b) \<in> P \<or> (a \<oplus> (negative b\<oplus> b)) = Z\<oplus> b" using 04 plus_assoc  by auto
-  have 06:"(a  \<ominus> b) \<in> P \<or> (a \<oplus> Z) = b" using 05 plus_ident negation  by auto
-  have 06:"(a  \<ominus> b) \<in> P \<or> a = b" using 06 plus_ident by auto
+  have 03:"(a  \<ominus> b) \<in> P \<or> (a \<oplus> neg b) = Z" using 02  diff_def negation by auto
+  have 04:"(a  \<ominus> b) \<in> P \<or> (a \<oplus> neg b)\<oplus> b = Z\<oplus> b" using 03  by auto
+  have 05:"(a  \<ominus> b) \<in> P \<or> (a \<oplus> (neg b\<oplus> b)) = Z\<oplus> b" using 04 plus_assoc  by auto
+  have 06:"(a  \<ominus> b) \<in> P \<or> (a \<oplus> Z) = b" using 05 additive_ident negation  by auto
+  have 06:"(a  \<ominus> b) \<in> P \<or> a = b" using 06 additive_ident by auto
   have 00:"ge a b" using 06 ge_def by auto  
   then show ?thesis by auto
 qed
@@ -819,17 +784,21 @@ proof -
   have 1:"(c  \<ominus> b) \<in> NN" using 10 NN_ge by auto
   have 2:"(c  \<ominus> b)  \<oplus> (b  \<ominus> a) \<in> NN" using 0 1 additive_closure NN_def 
     using NN_closure by auto
-  have 3:"(c  \<oplus> (negative b))  \<oplus> (b   \<oplus> (negative a)) \<in> NN" using 2 diff_def by auto
-  have 4:"c  \<oplus> ((negative b)  \<oplus> (b   \<oplus> (negative a))) \<in> NN" using 3 plus_assoc by auto
-  have 5:"c  \<oplus> (((negative b)  \<oplus> b)   \<oplus> (negative a)) \<in> NN" using 4 plus_assoc by auto
-  have 6:"c  \<oplus> (Z   \<oplus> (negative a)) \<in> NN" using 5 negation by auto
-  have 7:"c  \<oplus> (negative a) \<in> NN" using 6 plus_ident by auto
+  have 3:"(c  \<oplus> (neg b))  \<oplus> (b   \<oplus> (neg a)) \<in> NN" using 2 diff_def by auto
+  have 4:"c  \<oplus> ((neg b)  \<oplus> (b   \<oplus> (neg a))) \<in> NN" using 3 plus_assoc by auto
+  have 5:"c  \<oplus> (((neg b)  \<oplus> b)   \<oplus> (neg a)) \<in> NN" using 4 plus_assoc by auto
+  have 6:"c  \<oplus> (Z   \<oplus> (neg a)) \<in> NN" using 5 negation by auto
+  have 7:"c  \<oplus> (neg a) \<in> NN" using 6 additive_ident by auto
   have 8:"(c  \<ominus> a) \<in> NN" using 7 diff_def by auto
   have 9: "ge c a" using 8 ge_NN by auto
   have 10: "le a c" using 9 le_def by simp
   then show ?thesis by auto
 qed
 
+
+thm lt_def
+thm gt_def
+
 lemma neg_prod_pos:
   fixes a b
   assumes "lt a Z" and "lt b Z"
@@ -840,58 +809,37 @@ proof -
 
   have 2: "Z  \<ominus>  a \<in> P" using 0 gt_def by auto
   have 3: "Z  \<ominus>  b \<in> P" using 1 gt_def by auto
-  have 4: "negative a \<in> P" using 2 diff_def plus_ident by auto
-  have 5: "negative b \<in> P" using 3 diff_def plus_ident by auto
-  hence "(negative a  \<odot>  negative b) \<in> P" using 4  multiplicative_closure by auto
-  hence  "(a  \<odot>  b) \<in> P" using negative_product  by auto
-  hence  "(a  \<odot>  b) \<oplus> Z \<in> P" using plus_ident  by auto
-  hence  "(a  \<odot>  b) \<oplus> (negative Z) \<in> P" using negZ  by auto
-  hence 10:  "(a  \<odot>  b)  \<ominus>  Z \<in> P" using diff_def  by auto 
-  show ?thesis  using 10 gt_def by auto
-qed
-
-(*
-lemma neg_prod_pos:
-  fixes a b
-  assumes "lt a Z" and "lt b Z"
-  shows "gt (a  \<odot> b) Z"
-proof -
-  have 0: "gt Z a" using assms lt_def by auto
-  have 1: "gt Z b" using assms lt_def by auto
-
-  have 2: "Z  \<ominus>  a \<in> P" using 0 gt_def by auto
-  have 3: "Z  \<ominus>  b \<in> P" using 1 gt_def by auto
-  have 4: "negative a \<in> P" using 2 diff_def plus_ident by auto
-  have 5: "negative b \<in> P" using 3 diff_def plus_ident by auto
-  have 6: "(negative a  \<odot>  negative b) \<in> P" 
+  have 4: "neg a \<in> P" using 2 diff_def additive_ident by auto
+  have 5: "neg b \<in> P" using 3 diff_def additive_ident by auto
+  have 6: "(neg a  \<odot>  neg b) \<in> P" 
     using 4 5 multiplicative_closure  by auto
-  have 7:  "(a  \<odot>  b) \<in> P" using 6 negative_product by auto
-  have 8:  "(a  \<odot>  b) \<oplus> Z \<in> P" using 7 plus_ident by auto
-  have 9:  "(a  \<odot>  b) \<oplus> (negative Z) \<in> P" using 8 negZ by auto
+  have 7:  "(a  \<odot>  b) \<in> P" using 6 neg_product by auto
+  have 8:  "(a  \<odot>  b) \<oplus> Z \<in> P" using 7 additive_ident by auto
+  have 9:  "(a  \<odot>  b) \<oplus> (neg Z) \<in> P" using 8 negZ by auto
   have 10:  "(a  \<odot>  b)  \<ominus>  Z \<in> P" using 9 diff_def by auto
   show ?thesis using 10 gt_def by auto 
 qed
-*)
+
 lemma square_pos:
   fixes b
   assumes "b \<noteq> Z"
   shows "gt (b \<odot> b)  Z"
 proof -
-  have 0: "b \<in> P \<or> (negative b) \<in> P" using assms trichotomy by auto
+  have 0: "b \<in> P \<or> (neg b) \<in> P" using assms trichotomy by auto
   show ?thesis
   proof (cases "b \<in> P")
     case True
     have "(b \<odot> b) \<in> P" using True multiplicative_closure by auto
-    hence "(b \<odot> b)  \<oplus> Z  \<in> P" using plus_ident by auto
-    hence "(b \<odot> b)  \<oplus> (negative Z)  \<in> P" using negZ  by auto
+    hence "(b \<odot> b)  \<oplus> Z  \<in> P" using additive_ident by auto
+    hence "(b \<odot> b)  \<oplus> (neg Z)  \<in> P" using negZ  by auto
     hence "(b \<odot> b)  \<ominus>  Z  \<in> P" using diff_def  by auto
     
     then show ?thesis using gt_def by auto
   next
     case False
-    have "(negative b) \<in> P" using 0 False by auto
+    have "(neg b) \<in> P" using 0 False by auto
     hence "lt b Z" using lt_def gt_def 
-      by (simp add: plus_ident(2) diff_def)
+      by (simp add: additive_ident(2) diff_def)
     then show ?thesis using neg_prod_pos by auto 
   qed
 qed
@@ -905,13 +853,7 @@ proof -
 qed
 
 definition abs  where
-"abs a  \<equiv> (if gt a Z then a else negative a)"
-
-(* jfh: I tried to do a by-cases proof of the triangle inequality,
-but found myself muddled up in the cases, So I wrote a tiny 
-lemma for each case, where I assumed a and b were both nonnegative, 
-or that one was negative and the other nonnegative, etc. These are called
-ti1, ti2, ti3, ti4, one fore each case *)
+"abs a  \<equiv> (if gt a Z then a else neg a)"
 
 lemma ti1:
   fixes a::r and  b
@@ -934,10 +876,10 @@ qed
 
 lemma negneg:
   fixes a::r 
-  shows "negative (negative a) = a"
+  shows "neg (neg a) = a"
 proof -
-  have 0: "(negative a)  \<oplus> a = Z" using unique_negative negation by auto
-  have 1: "negative (negative a) = a" using 0 unique_negative by auto
+  have 0: "(neg a)  \<oplus> a = Z" using unique_neg negation by auto
+  have 1: "neg (neg a) = a" using 0 unique_neg by auto
   show ?thesis using 1 by auto
 qed
 
@@ -950,14 +892,14 @@ lemma ti2:
   assumes "lt b Z"
   shows "le Nab (Na  \<oplus> Nb)" 
 proof -
-  have 0: "Na = negative a" using abs_def assms  ge_def gt_def lt_def negZ 
+  have 0: "Na = neg a" using abs_def assms  ge_def gt_def lt_def negZ 
     by (meson help3b trichotomy)
-  have 1: "Nb = negative b" using  abs_def assms  ge_def gt_def lt_def negZ  by (meson help3b trichotomy)
+  have 1: "Nb = neg b" using  abs_def assms  ge_def gt_def lt_def negZ  by (meson help3b trichotomy)
   have 2: "lt  (a \<oplus> b) Z" using assms ge_def gt_def lt_def additive_closure
-    by (metis plus_ident(1) diff_def ex3 negsub)
-  have 3: "Nab = negative (a \<oplus> b)" using abs_def 2 ge_def gt_def lt_def assms negZ 
+    by (metis additive_ident(1) diff_def ex3 negsub)
+  have 3: "Nab = neg (a \<oplus> b)" using abs_def 2 ge_def gt_def lt_def assms negZ 
     using trichotomy3 by fastforce
-  have 4: "negative (a \<oplus> b) = (negative a) \<oplus> (negative b)"  using neg_sum by auto 
+  have 4: "neg (a \<oplus> b) = (neg a) \<oplus> (neg b)"  using neg_sum by auto 
   have 5: "Nab = (Na \<oplus> Nb)" using 0 1 3 4  by auto
   have 6: "le Nab (Na \<oplus> Nb)" using 5 le_def ge_def by auto
   show ?thesis using 6 by auto
@@ -975,15 +917,15 @@ lemma ti3:
   shows "le Nab (Na  \<oplus> Nb)" 
 proof -
   have 0: "Na =  a" using abs_def assms  ge_def gt_def lt_def negZ by auto
-  have 1: "Nb = negative b" using  abs_def assms  ge_def gt_def lt_def negZ 
+  have 1: "Nb = neg b" using  abs_def assms  ge_def gt_def lt_def negZ 
     using trichotomy3 by fastforce
   have 2: "gt  (a \<oplus> b) Z" using assms by auto 
   have 3: "Nab = (a \<oplus> b)" using abs_def 2 ge_def gt_def lt_def assms negZ 
     using trichotomy3 by fastforce
-  have 4: "lt b (negative b)" using assms lt_def
-    by (simp add: additive_closure plus_ident(2) diff_def gt_def)
-  have 5: "lt (b \<oplus> a)  ((negative b) \<oplus> a)" using 4 assms le_def lt_def gt_def slightly_more_interesting by auto
-  have 6: "lt (a \<oplus> b)  (a \<oplus> (negative b))" using 5 plus_commute by auto
+  have 4: "lt b (neg b)" using assms lt_def
+    by (simp add: additive_closure additive_ident(2) diff_def gt_def)
+  have 5: "lt (b \<oplus> a)  ((neg b) \<oplus> a)" using 4 assms le_def lt_def gt_def slightly_more_interesting by auto
+  have 6: "lt (a \<oplus> b)  (a \<oplus> (neg b))" using 5 plus_commute by auto
   have 7: "lt Nab (Na \<oplus> Nb)" using 6 le_def 3 0 1 by auto
   have 8: "le Nab (Na \<oplus> Nb)" using 7 le_def ge_def lt_def gt_def by auto
   then show ?thesis using 8 by auto
@@ -1001,30 +943,66 @@ lemma ti4:
   shows "le Nab (Na  \<oplus> Nb)" 
 proof - 
   have 0: "Na =  a" using abs_def assms  ge_def gt_def lt_def negZ by auto
-  have 1: "Nb = negative b" using  abs_def assms  ge_def gt_def lt_def negZ 
+  have 1: "Nb = neg b" using  abs_def assms  ge_def gt_def lt_def negZ 
     using trichotomy3 by fastforce
   have 2: "le  (a \<oplus> b) Z" using assms by auto 
-  have 3: "Nab = ((negative a)  \<ominus>  b)" using diff_def abs_def 2 ge_def gt_def lt_def assms negZ 
-    trichotomy3   by (metis le_def neg_sum) 
-  have 4: "le (negative a) Z" using assms(5) le_def 
+  have 3: "Nab = ((neg a)  \<ominus>  b)" using diff_def abs_def 2 ge_def gt_def lt_def assms negZ 
+    trichotomy3   by (metis le_def neg_sum)
+  have 4: "le (neg a) Z" using assms(5) le_def 
     by (metis ge_def   negsub subtractZ3)
   have 5: "le  Z a" using assms(5) le_def by auto
-  have 6: "le (negative a) a"
+  have 6: "le (neg a) a"
     using "4" "5" almost_done_le by blast  
-  have 7: "le ((negative a)  \<ominus> b)  (a  \<ominus> b)" using 6 assms le_def lt_def gt_def diff_def ge_def 
+  have 7: "le ((neg a)  \<ominus> b)  (a  \<ominus> b)" using 6 assms le_def lt_def gt_def diff_def ge_def 
       slightly_more_interesting by auto
-  have 8: "le ((negative a)  \<ominus> b)  (a \<oplus> (negative b))" using 7 plus_commute diff_def by auto
+  have 8: "le ((neg a)  \<ominus> b)  (a \<oplus> (neg b))" using 7 plus_commute diff_def by auto
   have 9: "le Nab (Na \<oplus> Nb)" using 8 le_def 3 0 1 by auto
   have 10: "le Nab (Na \<oplus> Nb)" using 9 le_def by auto
   then show ?thesis using 10 by auto 
 qed
 
-(* jfh: to finish up the proof of the triangle inequality,
-I confess that in places I used "sledgehammer", and to make it 
-get the job done, I needed these lemmas. They're all more or less the
-same, so you should feel free to assemble a team of friends and each prove one 
-of them *)
+<<<<<<< HEAD
+lemma triangle_inequality_spivak:
+  fixes a::r and  b
+  assumes "Nab = abs (a \<oplus> b)" 
+  assumes "Na = abs a" 
+  assumes "Nb = abs b" 
+  shows "le Nab (Na  \<oplus> Nb)" 
+proof (cases "ge a Z")
+  case True
+  have aPos: "ge a Z" using True by auto
+  then show ?thesis 
+  proof (cases "ge b Z")
+    case True
+    have bPos: "ge b Z" using True by auto
+    then show ?thesis using aPos bPos assms ti1 by auto
+  next (* a \<ge> 0, b < 0 case *)
+    case False
+    have bNeg: "lt b Z" using False lt_def ge_def gt_def trichotomy3 by fastforce 
+    then show ?thesis using aPos bNeg assms sorry
+(*      by (smt (verit) le_def lt_def ti4 trichotomy3) 
+  qed
 
+  case False (* a < 0 *)
+  also have aNeg: "lt a Z" using False lt_def ge_def gt_def trichotomy3 True by fastforce 
+  then show ?thesis sorry
+  proof (cases "ge b Z")
+    case True(* a < -0, b \<ge> 0 *)
+    have bPos: "ge b Z" using False by (simp add: aPos)
+
+    then show ?thesis using aNeg bPos ti3 le_def lt_def trichotomy3 try
+  next (* a < 0, b < 0  *)
+    case False
+    have bNeg: "lt b Z" using False lt_def ge_def gt_def trichotomy3 by fastforce 
+    then show ?thesis sorry
+  qed *)
+  qed
+next
+  show ?thesis sorry
+qed
+
+=======
+>>>>>>> 01ec50ca5983c0901f0d3d0707b97c4d7094c63a
 lemma ge_lt:
   fixes b
   assumes "(\<not> ge b Z)"
@@ -1033,8 +1011,8 @@ proof -
   have 0:  "\<not>((b \<ominus> Z)  \<in> P) \<and> (b \<noteq> Z)" using assms ge_def by simp
   have 1:  "\<not>((b \<ominus> Z)  \<in> P)" using 0 by simp
   have 2:  "\<not>(b  \<in> P)" using 1 subtractZ3 by auto
-  have 3: " (negative b) \<in> P" using 0 2 trichotomy by auto
-  have 4: " (negative b) = Z \<ominus> b"  using diff_def plus_ident by auto
+  have 3: " (neg b) \<in> P" using 0 2 trichotomy by auto
+  have 4: " (neg b) = Z \<ominus> b"  using diff_def additive_ident by auto
   show ?thesis using gt_def 4 3 lt_def by auto
 qed
 
@@ -1046,8 +1024,8 @@ proof -
   have 0:  "\<not>((b \<ominus> Z)  \<in> P)" using assms gt_def by simp
   have 1:  "\<not>((b \<ominus> Z)  \<in> P)" using 0 by simp
   have 2:  "\<not>(b  \<in> P)" using 1 subtractZ3 by auto
-  have 3: " (negative b) \<in> P \<or> b = Z " using 0 2 trichotomy by auto
-  have 4: " (negative b) = Z \<ominus> b"  using diff_def plus_ident by auto
+  have 3: " (neg b) \<in> P \<or> b = Z " using 0 2 trichotomy by auto
+  have 4: " (neg b) = Z \<ominus> b"  using diff_def additive_ident by auto
   have 5: " Z \<ominus> b \<in> P \<or>  b = Z " using 3 4 diff_def by argo
   show ?thesis using gt_def 5 le_def lt_def ge_def by blast 
 qed
@@ -1061,10 +1039,10 @@ proof -
   have 0:  "\<not>(lt b Z \<or> b = Z)" using assms le_def lt_def gt_def ge_def by auto
   have 1:  "\<not>(((Z \<ominus> b)  \<in> P) \<and> b = Z)" using 0 lt_def gt_def le_def by auto
   have 2:  "\<not>( b = Z \<and> ((Z \<ominus> b)  \<in> P))" using 1  by auto
-  have 3:  "\<not>( b = Z \<and> ((negative b)  \<in> P))" using 2 0 negation diff_def by auto
-  have 4: "(b = Z \<and> \<not>( b \<in> P \<or>  (negative b) \<in> P)) \<or>
-  (b \<in> P \<and> \<not>( b = Z \<or>  (negative b) \<in> P)) \<or>
-((negative b) \<in> P \<and> \<not>( b = Z \<or> b \<in> P))" using trichotomy by auto
+  have 3:  "\<not>( b = Z \<and> ((neg b)  \<in> P))" using 2 0 negation diff_def by auto
+  have 4: "(b = Z \<and> \<not>( b \<in> P \<or>  (neg b) \<in> P)) \<or>
+  (b \<in> P \<and> \<not>( b = Z \<or>  (neg b) \<in> P)) \<or>
+((neg b) \<in> P \<and> \<not>( b = Z \<or> b \<in> P))" using trichotomy by auto
   have 5: "b \<in> P" using 3 4
     using assms gtP1 gt_le by blast
   then show ?thesis using gtP2 by auto
@@ -1078,13 +1056,13 @@ lemma lt_ge:
 proof -
   have 0: "\<not> (lt b Z)" using assms by auto
   have 1: "Z \<ominus> b \<notin> P" using lt_def gt_def 0 by auto
-  have 2: "Z \<ominus> b = Z \<or> (negative (Z \<ominus> b)) \<in> P" using 1 trichotomy ge_def by auto
-  have 3: "Z \<ominus> b = Z \<or> (negative (Z \<ominus> b)) \<in> P" using 2 diff_def plus_ident by auto
-  have 4: "Z \<oplus>negative  b = Z \<or> (negative (Z \<ominus> b)) \<in> P" using 3 diff_def plus_ident by auto
-  have 5: "negative  b = Z \<or> (negative (Z \<ominus> b)) \<in> P" using 4 diff_def plus_ident by auto
-  have 6: "negative (negative  b) = negative Z \<or> (negative (Z \<ominus> b)) \<in> P" using 5 negation by auto
-  have 7: "  b = negative Z \<or> (negative (Z \<ominus> b)) \<in> P" using 6 negneg by auto
-  have 8: "  b = Z \<or> (negative (Z \<ominus> b)) \<in> P" using 7 negZ by auto
+  have 2: "Z \<ominus> b = Z \<or> (neg (Z \<ominus> b)) \<in> P" using 1 trichotomy ge_def by auto
+  have 3: "Z \<ominus> b = Z \<or> (neg (Z \<ominus> b)) \<in> P" using 2 diff_def additive_ident by auto
+  have 4: "Z \<oplus>neg  b = Z \<or> (neg (Z \<ominus> b)) \<in> P" using 3 diff_def additive_ident by auto
+  have 5: "neg  b = Z \<or> (neg (Z \<ominus> b)) \<in> P" using 4 diff_def additive_ident by auto
+  have 6: "neg (neg  b) = neg Z \<or> (neg (Z \<ominus> b)) \<in> P" using 5 negation by auto
+  have 7: "  b = neg Z \<or> (neg (Z \<ominus> b)) \<in> P" using 6 negneg by auto
+  have 8: "  b = Z \<or> (neg (Z \<ominus> b)) \<in> P" using 7 negZ by auto
   have 9: "  b = Z \<or> (b \<ominus> Z) \<in> P" using 8 negsub by metis
   have 10: "b \<ominus> Z \<in> P\<or> b = Z" using 9 by auto
   have 11: "ge b Z" using 10 ge_def trichotomy negation by auto
