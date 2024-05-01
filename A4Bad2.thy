@@ -51,9 +51,9 @@ locale affine_plane =
     assumes
     a1a: "\<lbrakk>P \<noteq> Q; P \<in> Points; Q \<in> Points\<rbrakk> \<Longrightarrow> join P Q \<in> Lines \<and> meets P (join P Q)  \<and> meets Q (join P Q)" and
     a1b: "\<lbrakk>P \<noteq> Q; P \<in> Points; Q \<in> Points; meets P m; meets Q m\<rbrakk> \<Longrightarrow> m = join P Q" and
-    a2a: "\<lbrakk>\<not> meets P l; P \<in> Points; l \<in> Lines\<rbrakk> \<Longrightarrow> find_parallel l P \<in> Line" and
-    a2b: "\<lbrakk>\<not> meets P l; P \<in> Points; l \<in> Lines\<rbrakk> \<Longrightarrow>  ( find_parallel l P) || l" and
-    a2c: "\<lbrakk>\<not> meets P l; P \<in> Points; l \<in> Lines\<rbrakk> \<Longrightarrow>  meets P (find_parallel l P)" and
+    a2a: "\<lbrakk> P \<in> Points; l \<in> Lines\<rbrakk> \<Longrightarrow> find_parallel l P \<in> Lines" and
+    a2b: "\<lbrakk> P \<in> Points; l \<in> Lines\<rbrakk> \<Longrightarrow>  ( find_parallel l P) || l" and
+    a2c: "\<lbrakk> P \<in> Points; l \<in> Lines\<rbrakk> \<Longrightarrow>  meets P (find_parallel l P)" and
     a3: "\<exists>P Q R. P \<in> Points \<and> Q \<in> Points \<and> R \<in> Points \<and> P \<noteq> Q \<and> P \<noteq> R \<and> Q \<noteq> R \<and> \<not> (collinear P Q R)"
 begin
 (* to do
@@ -86,21 +86,6 @@ proof -
   have "join Q P = join P Q" using assms 2 3  a1b by blast
   then show ?thesis by auto
 qed
-
-(*
-lemma crossing_symmetric: 
-  fixes n k
-  assumes "n \<in> Lines"
-  assumes "k \<in> Lines"
-  assumes "n \<noteq> k" 
-  shows "join P Q = join Q P" 
-proof -
-  have 2: "meets P (join Q P)" using assms a1a by auto
-  have 3: "meets Q (join Q P)" using assms a1a by auto
-  have "join Q P = join P Q" using assms 2 3  a1b by blast
-  then show ?thesis by auto
-qed
-*)
 
 
 fun (in affine_plane_data) liesOn :: "'p \<Rightarrow> 'l \<Rightarrow> bool" (infix "liesOn" 50) where
@@ -259,12 +244,52 @@ fun  A4join::"a4pt \<Rightarrow> a4pt \<Rightarrow> a4line"  where
 | "A4join Sa Ra = A4RS"
 | "A4join Sa Sa = undefined"
 
+fun  A4pencil::"a4pt \<Rightarrow> a4line set"  where 
+   "A4pencil Pa = {A4PQ, A4PR, A4PS}"
+|  "A4pencil Qa = {A4PQ, A4QR, A4QS}"
+|  "A4pencil Ra = {A4PR, A4QR, A4RS}"
+|  "A4pencil Sa = {A4PS, A4QS, A4RS}"
+
+
 fun A4meets::"a4pt \<Rightarrow> a4line \<Rightarrow> bool" where
 "A4meets x m = (x \<in> points m)"
 
 fun A4find_parallel::"a4line \<Rightarrow> a4pt \<Rightarrow> a4line"  where
 "A4find_parallel m T = (if T \<in> points m then m else (A4complement m))"
 
+theorem line_in_pencil:
+  assumes "A4meets P m"
+  shows "m \<in> A4pencil P"
+proof (cases P)
+  case Pa
+  have 0: "Pa \<in> points m"  using A4meets.simps assms Pa by auto
+  have "m = A4PQ \<or> m = A4PR \<or> m = A4PS" using 0 points.simps
+    by (metis a4pt.distinct(1) a4pt.distinct(3) a4pt.distinct(5) emptyE insertE points.cases) 
+  then show ?thesis
+    using A4pencil.simps(1) Pa by blast 
+next
+  case Qa
+  have 0: "Qa \<in> points m"  using A4meets.simps assms Qa by auto
+  have "m = A4PQ \<or> m = A4QR \<or> m = A4QS" using 0 points.simps
+    by (metis a4pt.distinct(2) a4pt.distinct(8) a4pt.distinct(10)
+ emptyE insertE points.cases)
+  then show ?thesis
+    using A4pencil.simps(2) Qa by blast
+next
+  case Ra
+  have 0: "Ra \<in> points m"  using A4meets.simps assms Ra by auto
+  have "m = A4PR \<or> m = A4QR \<or> m = A4RS" using 0 points.simps
+    by (metis a4pt.distinct(4) a4pt.distinct(8) a4pt.distinct(12) emptyE insertE points.cases) 
+  then show ?thesis
+    using A4pencil.simps(3) Ra by blast
+next
+  case Sa
+  have 0: "Sa \<in> points m"  using A4meets.simps assms Sa by auto
+  have "m = A4PS \<or> m = A4RS \<or> m = A4QS" using 0 points.simps
+    by (metis a4pt.distinct(6)  a4pt.distinct(10)  a4pt.distinct(12) emptyE insertE points.cases) 
+  then show ?thesis
+    using A4pencil.simps(4) Sa by blast
+qed
 
 theorem PinPQ1:
   assumes   "P \<noteq> Q"
@@ -277,7 +302,7 @@ theorem QinPQ1:
   fixes P Q
   assumes   "P \<noteq> Q" 
   shows "A4meets Q  (A4join P Q)"
-  using points.simps a4pt.simps A4join.simps
+  using points.simps a4pt.simps(1-12) A4join.simps 
   by (metis PinPQ1 a4pt.exhaust assms)
 
 theorem A4a1a1:
@@ -302,25 +327,139 @@ theorem A4a1a:
   using A4a1a1 A4a1a2 A4a1a3 assms by auto
 
 theorem A4a1b: 
-  assumes "P \<noteq> Q" and "P  \<in> A4Points" and "Q \<in> A4Points" and "m \<in> A4Lines"
-  assumes "A4meets P m" and "A4meets Q m"
-  shows "m = A4join P Q"
-proof (cases P; cases Q)
-  assume "P = Pa"
-  assume "Q = Qa"
-  show "m = A4join P Q"
-    using assms A4Lines_def A4meets.elims a4pt.exhaust A4join.elims points.elims a4pt.distinct a4pt.simps
-by (smt (verit) insertE insert_absorb singleton_insert_inj_eq')
+  assumes "A \<noteq> B" and "A  \<in> A4Points" and "B \<in> A4Points" 
+  assumes "A4meets A m" and "A4meets B m"
+  shows "m = A4join A B"
+proof -
+  have 0:"m \<in> A4pencil A" using line_in_pencil assms by auto
+  have 1:"m \<in> A4pencil B" using line_in_pencil assms by auto
+  have 2:"m \<in> A4pencil A \<inter> A4pencil B" using 0 1 by auto
+  show ?thesis 
+  proof (cases A; cases B)
+    assume A_point: "A = Pa" and B_point: "B = Pa"
+    have z: False using assms A_point B_point by auto
+    show ?thesis using z by auto
+  next
+    assume A_point: "A = Pa" and B_point: "B = Qa"
+    have 0: "m = A4PQ" using 2 A_point B_point by auto
+    thus ?thesis 
+      by (simp add: A_point B_point)
+  next
+    assume A_point: "A = Pa" and B_point: "B = Ra"
+    have 0: "m = A4PR" using 2 A_point B_point by auto
+    thus ?thesis 
+      by (simp add: A_point B_point)
+  next
+    assume A_point: "A = Pa" and B_point: "B = Sa"
+    have 0: "m = A4PS" using 2 A_point B_point by auto
+    thus ?thesis 
+      by (simp add: A_point B_point)
 
- 
+  next
+    assume A_point: "A = Qa" and B_point: "B = Qa"
+    have z: False using assms A_point B_point by auto
+    show ?thesis using z by auto
+  next
+    assume A_point: "A = Qa" and B_point: "B = Pa"
+    have 0: "m = A4PQ" using 2 A_point B_point by auto
+    thus ?thesis 
+      by (simp add: A_point B_point)
+  next
+    assume A_point: "A = Qa" and B_point: "B = Ra"
+    have 0: "m = A4QR" using 2 A_point B_point by auto
+    thus ?thesis 
+      by (simp add: A_point B_point)
+  next
+    assume A_point: "A = Qa" and B_point: "B = Sa"
+    have 0: "m = A4QS" using 2 A_point B_point by auto
+    thus ?thesis 
+      by (simp add: A_point B_point)
 
-(*
+  next
+    assume A_point: "A = Ra" and B_point: "B = Ra"
+    have z: False using assms A_point B_point by auto
+    show ?thesis using z by auto
+  next
+    assume A_point: "A = Ra" and B_point: "B = Pa"
+    have 0: "m = A4PR" using 2 A_point B_point by auto
+    thus ?thesis 
+      by (simp add: A_point B_point)
+  next
+    assume A_point: "A = Ra" and B_point: "B = Qa"
+    have 0: "m = A4QR" using 2 A_point B_point by auto
+    thus ?thesis 
+      by (simp add: A_point B_point)
+  next
+    assume A_point: "A = Ra" and B_point: "B = Sa"
+    have 0: "m = A4RS" using 2 A_point B_point by auto
+    thus ?thesis 
+      by (simp add: A_point B_point)
+
+  next
+    assume A_point: "A = Sa" and B_point: "B = Sa"
+    have z: False using assms A_point B_point by auto
+    show ?thesis using z by auto
+  next
+    assume A_point: "A = Sa" and B_point: "B = Pa"
+    have 0: "m = A4PS" using 2 A_point B_point by auto
+    thus ?thesis 
+      by (simp add: A_point B_point)
+  next
+    assume A_point: "A = Sa" and B_point: "B = Qa"
+    have 0: "m = A4QS" using 2 A_point B_point by auto
+    thus ?thesis 
+      by (simp add: A_point B_point)
+  next
+    assume A_point: "A = Sa" and B_point: "B = Ra"
+    have 0: "m = A4RS" using 2 A_point B_point by auto
+    thus ?thesis 
+      by (simp add: A_point B_point)
+  qed
+qed
+
+theorem A4a2a:
+  assumes "P \<in> A4Points" and "l \<in> A4Lines"
+  shows "A4find_parallel l P \<in> A4Lines"
+proof -
+  show ?thesis using A4Lines_def A4complement.cases by blast
+qed
+
+theorem A4a2b:
+  assumes "P \<in> A4Points" and "l \<in> A4Lines"
+  shows "affine_plane_data.parallel A4Points A4Lines A4meets (A4find_parallel l P) l" 
+proof -
+  show ?thesis unfolding affine_plane_data.parallel_def 
+  proof -
+    have h0:"A4find_parallel l P \<in> A4Lines \<and> l \<in> A4Lines" using assms A4a2a by auto
+    have h1: "A4find_parallel l P = l \<or> (\<nexists>Pa. Pa \<in> A4Points \<and> A4meets Pa (A4find_parallel l P) \<and> A4meets Pa l)" 
+      using assms A4a2a
+      by (smt (z3) A4complement.simps(1) A4complement.simps(2) A4complement.simps(3) 
+          A4complement.simps(4) A4complement.simps(5) A4complement.simps(6) 
+          A4find_parallel.elims A4pencil.elims a4line.simps(12) 
+          a4line.simps(14) a4line.simps(18) a4line.simps(2) a4line.simps(4) a4line.simps(6) 
+          insertE line_in_pencil singletonD) 
+    show "if A4find_parallel l P \<in> A4Lines \<and> l \<in> A4Lines
+    then A4find_parallel l P = l \<or> (\<nexists>Pa. Pa \<in> A4Points \<and> A4meets Pa (A4find_parallel l P) \<and> A4meets Pa l) else undefined"
+      using h0 h1 by auto
+  qed
+qed
+
+theorem A4a2c:
+  assumes "P \<in> A4Points" and "l \<in> A4Lines"
+  shows "A4meets P (A4find_parallel l P)"
+proof -
+  show ?thesis using A4find_parallel.simps A4meets.simps assms
+    by (smt (z3) A4complement.elims A4join.simps(10) A4join.simps(12) A4join.simps(2) A4join.simps(3)
+        A4join.simps(4) A4join.simps(5) A4join.simps(7) A4join.simps(8) 
+        A4pencil.cases QinPQ1 a4pt.distinct(1) a4pt.distinct(7) insertI1 
+        points.simps(2) points.simps(3) points.simps(5) points.simps(6)) 
+qed
+(*  a1a: "\<lbrakk>P \<noteq> Q; P \<in> Points; Q \<in> Points\<rbrakk> \<Longrightarrow> join P Q \<in> Lines \<and> meets P (join P Q)  \<and> meets Q (join P Q)" and
     a1b: "\<lbrakk>P \<noteq> Q; P \<in> Points; Q \<in> Points; meets P m; meets Q m\<rbrakk> \<Longrightarrow> m = join P Q" and
-    a2a: "\<lbrakk>\<not> meets P l; P \<in> Points; l \<in> Lines\<rbrakk> \<Longrightarrow> find_parallel l P \<in> Line" and
-    a2b: "\<lbrakk>\<not> meets P l; P \<in> Points; l \<in> Lines\<rbrakk> \<Longrightarrow>  ( find_parallel l P) || l" and
-    a2c: "\<lbrakk>\<not> meets P l; P \<in> Points; l \<in> Lines\<rbrakk> \<Longrightarrow>  meets P (find_parallel l P)" and
+    a2a: "\<lbrakk> P \<in> Points; l \<in> Lines\<rbrakk> \<Longrightarrow> find_parallel l P \<in> Lines" and
+    a2b: "\<lbrakk> P \<in> Points; l \<in> Lines\<rbrakk> \<Longrightarrow>  ( find_parallel l P) || l" and
+    a2c: "\<lbrakk> P \<in> Points; l \<in> Lines\<rbrakk> \<Longrightarrow>  meets P (find_parallel l P)" and
     a3: "\<exists>P Q R. P \<in> Points \<and> Q \<in> Points \<and> R \<in> Points \<and> P \<noteq> Q \<and> P \<noteq> R \<and> Q \<noteq> R \<and> \<not> (collinear P Q R)"
- 
 *)
 
 lemma not_four_and:
@@ -329,7 +468,7 @@ lemma not_four_and:
   shows   "(\<not> p1) \<or> (\<not> p2) \<or> (\<not> p3) \<or> (\<not> p4)"
   using assms by blast
 
-theorem A4affine_plane_a3: " \<exists>P Q R.
+theorem A4a3: " \<exists>P Q R.
        P \<in> A4Points \<and>
        Q \<in> A4Points \<and>
        R \<in> A4Points \<and>
@@ -341,437 +480,84 @@ theorem A4affine_plane_a3: " \<exists>P Q R.
            A4Lines
            A4meets P Q R" 
 proof -
-  show ?thesis 
-  proof -
-
   have u0: "Pa \<in> A4Points" using A4Points_def by blast
   have u1: "Qa \<in> A4Points" using A4Points_def by blast
   have u2: "Ra \<in> A4Points" using A4Points_def by blast
   have d0:"Pa \<noteq> Qa" by simp
   have d1:"Pa \<noteq> Ra" by simp
   have d2:"Qa \<noteq> Ra" by simp
-  have "\<not> (affine_plane_data.collinear
+  have basics: "Pa \<in> A4Points \<and>  Qa \<in> A4Points \<and> Ra \<in> A4Points \<and> 
+      Pa \<noteq> Qa \<and> Pa \<noteq> Ra \<and> Qa \<noteq> Ra" using u0 u1 u2 d0 d1 d2 by blast
+  show ?thesis 
+  proof -
+    presume r: "\<not> (affine_plane_data.collinear
            A4Points A4Lines A4meets Pa Qa Ra)" 
-  proof -
-(*    have 0: "affine_plane_data.collinear A4Points A4Lines A4meets Pa Qa Ra = 
-     (if Pa \<in> A4Points \<and> Qa \<in> A4Points \<and> Ra \<in> A4Points *)
-    have 0: "affine_plane_data.collinear A4Points A4Lines A4meets Pa Qa Ra = 
- (\<exists> l. l \<in> A4Lines \<and> A4meets Pa l \<and> A4meets Qa l \<and> A4meets Ra l)" 
-      using affine_plane_data.collinear.simps u0 u1 u2 by auto
-    fix l
-    assume " l \<in> A4Lines \<and> A4meets Pa l \<and> A4meets Qa l \<and> A4meets Ra l"
-    have 
-    have 3: "\<not>  (\<exists> l. l \<in> A4Lines \<and> A4meets Pa l \<and> A4meets Qa l \<and> A4meets Ra l) =
-          (\<forall> l . \<not> (l \<in> A4Lines \<and> A4meets Pa l \<and> A4meets Qa l \<and> A4meets Ra l)) " by auto
-    have 4: "(\<forall> l . \<not> (l \<in> A4Lines \<and> (A4meets Pa l) \<and> (A4meets Qa l) \<and> (A4meets Ra l)))  = 
-          (\<forall> l .(\<not> ( l \<in> A4Lines)) \<or> (\<not> (A4meets Pa l)) \<or>  (\<not> (A4meets Qa l)) \<or> ( \<not> (A4meets Ra l)))" 
-      using  not_four_and by auto
-    have 5: "\<not>  (\<exists> l. l \<in> A4Lines \<and> A4meets Pa l \<and> A4meets Qa l \<and> A4meets Ra l) = 
-         (\<forall> l .(\<not> ( l \<in> A4Lines)) \<or> (\<not> (A4meets Pa l)) \<or>  (\<not> (A4meets Qa l)) \<or> ( \<not> (A4meets Ra l)))" 
-      using 3 4 by auto
-    fix l
-    have 6: "(\<not> ( l \<in> A4Lines)) \<or> (\<not> (A4meets Pa l)) \<or>  (\<not> (A4meets Qa l)) \<or> ( \<not> (A4meets Ra l)) = 
-      (\<not> (( l \<in> A4Lines) \<and> (A4meets Pa l) \<and> (A4meets Qa l) \<and> (A4meets Ra l)))" by auto
-    have 7: "(A4meets Pa l) = (l = A4PQ) \<or> (l = A4PR) \<or> (l = A4PS)" using A4meets.simps points.simps
-    proof -
-      have f1: "{Ra, Sa} \<noteq> {Ra} \<union> {Sa} \<or> points A4RS \<noteq> {Ra, Sa} \<or> {Ra} \<union> {Sa} = points l \<or> l \<noteq> A4RS"
-        by force
-      have "{Qa, Ra} \<noteq> {Qa} \<union> {Ra} \<or> points A4QR \<noteq> {Qa, Ra} \<or> {Qa} \<union> {Ra} = points l \<or> l \<noteq> A4QR"
-        by blast
-      then show ?thesis
-        using f1 by (smt (z3) A4complement.elims A4join.simps(5) A4meets.simps QinPQ1 Un_iff a4pt.simps(2) a4pt.simps(4) a4pt.simps(6) insert_absorb insert_is_Un points.simps(4) points.simps(5) points.simps(6) singleton_insert_inj_eq)
-    qed
-    have 8: "(A4meets Qa l) = (l = A4PQ)" using 7  by auto
-    have 11: "((A4meets Pa l) \<and> (A4meets Qa l) \<and> (A4meets Ra l)) = False" using 9 10 by auto
-    then show ?thesis
-      by (metis "0" A4Lines_def A4PQ_def A4PR_def A4PS_def A4QR_def A4QS_def A4RS_def A4meets.elims(2) d0 d1 d2 empty_iff insert_iff u0 u1 u2)
+    show ?thesis using basics r by blast
+  next
+    have "affine_plane_data.collinear A4Points A4Lines A4meets Pa Qa Ra  =
+     (if Pa \<in> A4Points \<and> Qa \<in> A4Points \<and> Ra \<in> A4Points 
+  then (\<exists> l. l \<in> A4Lines \<and> A4meets Pa l \<and> A4meets Qa l \<and> A4meets Ra l) else undefined)" 
+      using affine_plane_data.collinear.simps
+      by fastforce  
+    also
+    have 1: "... = (\<exists> l. (l \<in> A4Lines \<and> A4meets Pa l \<and> A4meets Qa l) \<and> A4meets Ra l)" using u0 u1 u2 by auto
+    also
+    have 2: "... = (\<exists> l. l = A4PQ \<and> A4meets Ra l)" 
+      by (metis A4a1a A4a1b A4join.simps(2) basics) 
+    have 3: "... = False" using A4meets.simps by auto
+    show "\<not> affine_plane_data.collinear A4Points A4Lines A4meets Pa Qa Ra" 
+      using 2 3  calculation by blast 
   qed
-  show ?thesis
-    using \<open>\<not> affine_plane_data.collinear A4Points A4Lines A4meets Pa Qa Ra\<close> u0 u1 u2 by blast
-qed
 qed
 
-
-theorem A4affine_plane_a1a: " \<And>P Q. P \<noteq> Q \<Longrightarrow>
-           P \<in> A4Points \<Longrightarrow> Q \<in> A4Points \<Longrightarrow> A4join P Q \<in> A4Lines \<and> A4meets P (A4join P Q) \<and> A4meets Q (A4join P Q)"
-proof -
+theorem A4_is_affine_plane: "affine_plane A4Points A4Lines A4meets A4join A4find_parallel"
+proof 
   show " \<And>P Q. P \<noteq> Q \<Longrightarrow>
-           P \<in> A4Points \<Longrightarrow> Q \<in> A4Points \<Longrightarrow> A4join P Q \<in> A4Lines \<and> A4meets P (A4join P Q) \<and> A4meets Q (A4join P Q)"  
-  proof -
-    fix P::a4pt
-    fix Q::a4pt
-    assume a0: "P \<noteq> Q"
-    show "P \<in> A4Points \<Longrightarrow> Q \<in> A4Points \<Longrightarrow> A4join P Q \<in> A4Lines \<and> A4meets P (A4join P Q) \<and> A4meets Q (A4join P Q)" 
-    proof (intro conjI)
-      show "P \<in> A4Points \<Longrightarrow>
-    Q \<in> A4Points \<Longrightarrow>
-    A4join P Q \<in> A4Lines" using a0 all_joins_are_lines by auto
-    next
-      show "P \<in> A4Points \<Longrightarrow> Q \<in> A4Points \<Longrightarrow> A4meets P (A4join P Q)"
-        using a0 all_joins_are_lines by auto
-    next
-      show "P \<in> A4Points \<Longrightarrow> Q \<in> A4Points \<Longrightarrow> A4meets Q (A4join P Q)"
-        using a0 all_joins_are_lines by auto
-    qed
-  qed
-qed
-
-theorem A4affine_plane_a1b:  
-  fixes P Q
-  assumes 
-    "P \<noteq> Q" and 
-    "P \<in> A4Points" and  "Q \<in> A4Points" and
-    "A4meets P m" and "A4meets Q m"
-  shows "m = A4join P Q"
-proof (cases "P")
-  case Pa
-    have Pfact: "P = Pa"
-      by (simp add: Pa) 
-  then show ?thesis 
-  proof (cases "Q")
-    case Pa
-    have Qfact: "Q = Pa"
-      by (simp add: Pa) 
-    have False using assms Pfact Qfact by auto
-    then show ?thesis by auto
-  next
-    case Qa
-    have Qfact: "Q = Qa"
-      by (simp add: Qa)
-    have j1: "A4join P Q = {Pa, Qa}" using Pfact Qfact A4join.simps by auto
-    have j2: "A4join P Q = A4PQ" using A4PQ_def j1  by auto
-    have mP: "A4meets Pa m" using assms Pfact by auto
-    have mQ: "A4meets Qa m" using assms Qfact by auto
-    have ss1: "m = A4PQ \<or> m = A4PR \<or> m = A4PS" using mP A4meets.simps
-      by (metis A4Lines_def A4QR_def A4QS_def A4RS_def a4pt.simps(1) a4pt.simps(3) a4pt.simps(5) empty_iff insert_iff)
-    have ss2: "m = A4PQ \<or> m = A4QR \<or> m = A4QS" using mQ A4meets.simps
-      by (metis A4PR_def A4PS_def a4pt.simps(1) a4pt.simps(7) a4pt.simps(9) empty_iff insert_iff ss1)
-    have mPQ: "m = A4PQ" using ss1 ss2 A4QR_def A4QS_def A4meets.elims(2) Pfact Qfact assms(4) by auto 
-
-    then show ?thesis using j2 by auto
-  next
-    case Ra
-    have Qfact: "Q = Ra"
-    by (simp add: Ra)
-    have j1: "A4join P Q = {Pa, Ra}" using Pfact Qfact A4join.simps by auto
-    have j2: "A4join P Q = A4PR" using A4PR_def j1  by auto
-    have mP: "A4meets Pa m" using assms Pfact by auto
-    have mQ: "A4meets Ra m" using assms Qfact by auto
-    have ss1: "m = A4PQ \<or> m = A4PR \<or> m = A4PS" using mP A4meets.simps
-      by (metis A4Lines_def A4QR_def A4QS_def A4RS_def a4pt.simps(1) a4pt.simps(3) a4pt.simps(5) empty_iff insert_iff)
-    have ss2: "m = A4PR \<or> m = A4QR \<or> m = A4RS" using mQ A4meets.simps
-      by (metis A4PQ_def A4PS_def a4pt.simps(11) a4pt.simps(3) a4pt.simps(7) insertE singletonD ss1) 
-    have mPQ: "m = A4PR" using ss1 ss2  A4meets.elims Pfact Qfact assms
-      using A4QR_def A4RS_def by auto
-    then show ?thesis using j2 by auto
-  next
-    case Sa
-    have Qfact: "Q = Sa"
-    by (simp add: Sa)
-    have j1: "A4join P Q = {Pa, Sa}" using Pfact Qfact A4join.simps by auto
-    have j2: "A4join P Q = A4PS" using A4PS_def j1  by auto
-    have mP: "A4meets Pa m" using assms Pfact by auto
-    have mQ: "A4meets Sa m" using assms Qfact by auto
-    have ss1: "m = A4PQ \<or> m = A4PR \<or> m = A4PS" using mP A4meets.simps
-      by (metis A4Lines_def A4QR_def A4QS_def A4RS_def a4pt.simps(1) a4pt.simps(3) a4pt.simps(5) empty_iff insert_iff)
-    have ss2: "m = A4PS \<or> m = A4QS \<or> m = A4RS" using mQ A4meets.simps
-      by (metis A4PQ_def A4PR_def a4pt.simps(11) a4pt.simps(5) a4pt.simps(9) insertE singletonD ss1) 
-    have mPQ: "m = A4PS" using ss1 ss2  A4meets.elims Pfact Qfact assms
-      using A4QS_def A4RS_def by auto
-    then show ?thesis using j2 by auto
-  qed
-next
-  case Qa
-  have Pfact: "P = Qa"
-      by (simp add: Qa) 
-    then show ?thesis 
-    proof (cases "Q")
-    case Qa
-    have Qfact: "Q = Qa"
-      by (simp add: Qa) 
-    have False using assms Pfact Qfact by auto
-    then show ?thesis by auto
-  next
-    case Pa
-    have Qfact: "Q = Pa"
-      by (simp add: Pa)
-    have j1: "A4join P Q = {Pa, Qa}" using Pfact Qfact A4join.simps by auto
-    have j2: "A4join P Q = A4PQ" using A4PQ_def j1  by auto
-    have mP: "A4meets Qa m" using assms Pfact by auto
-    have mQ: "A4meets Pa m" using assms Qfact by auto
-    have ss1: "m = A4PQ \<or> m = A4QR \<or> m = A4QS" using mP A4meets.simps
-      by (metis A4Lines_def A4PR_def A4PS_def A4RS_def Qa Qfact a4pt.simps(7) a4pt.simps(9) assms(1) empty_iff insert_iff)
-
-      have ss2: "m = A4PQ \<or> m = A4PR \<or> m = A4PS" using mQ A4meets.simps
-        by (metis A4QR_def A4QS_def a4pt.simps(1) a4pt.simps(3) a4pt.simps(5) empty_iff insert_iff ss1)
-
-    have mPQ: "m = A4PQ"
-      by (metis A4PR_def A4PS_def A4QR_def A4QS_def a4pt.simps(1) a4pt.simps(3) a4pt.simps(5) doubleton_eq_iff ss1 ss2) 
-
-    then show ?thesis using j2 by auto
-  next
-    case Ra
-    have Qfact: "Q = Ra"
-    by (simp add: Ra)
-    have j1: "A4join P Q = {Qa, Ra}" using Pfact Qfact A4join.simps by auto
-    have j2: "A4join P Q = A4QR" using A4QR_def j1  by auto
-    have mP: "A4meets Qa m" using assms Pfact by auto
-    have mQ: "A4meets Ra m" using assms Qfact by auto
-    have ss1: "m = A4PQ \<or> m = A4QR \<or> m = A4QS" using mP A4meets.simps
-      by (metis A4Lines_def A4PR_def A4PS_def A4RS_def a4pt.simps(1) a4pt.simps(7) a4pt.simps(9) empty_iff insert_iff)
-     
-    have ss2: "m = A4PR \<or> m = A4QR \<or> m = A4RS" using mQ A4meets.simps
-      by (metis A4PQ_def A4QS_def Qa Ra a4pt.simps(11) a4pt.simps(3) assms(1) empty_iff insertE ss1)
-
-    have mPQ: "m = A4QR" using ss1 ss2  A4meets.elims Pfact Qfact assms
-      using A4PQ_def A4QS_def by auto
-    then show ?thesis using j2 by auto
-  next
-    case Sa
-    have Qfact: "Q = Sa"
-    by (simp add: Sa)
-    have j1: "A4join P Q = {Qa, Sa}" using Pfact Qfact A4join.simps by auto
-    have j2: "A4join P Q = A4QS" using A4QS_def j1  by auto
-    have mP: "A4meets Qa m" using assms Pfact by auto
-    have mQ: "A4meets Sa m" using assms Qfact by auto
-    have ss1: "m = A4PQ \<or> m = A4QR \<or> m = A4QS" using mP A4meets.simps
-       by (metis A4Lines_def A4PR_def A4PS_def A4RS_def a4pt.simps(1) a4pt.simps(7) a4pt.simps(9) empty_iff insert_iff)
-
-      have ss2: "m = A4PS \<or> m = A4QS \<or> m = A4RS" using mQ A4meets.simps
-        using A4PQ_def A4QR_def ss1 subset_singleton_iff by auto
-        have mPQ: "m = A4QS" using ss1 ss2  A4meets.elims Pfact Qfact assms
-      using A4PQ_def A4QR_def by auto
-    then show ?thesis using j2 by auto
-  qed
-next
-  case Ra
-  have Pfact: "P = Ra"
-      by (simp add: Ra) 
-    then show ?thesis 
-    proof (cases "Q")
-    case Ra
-    have Qfact: "Q = Ra"
-      by (simp add: Ra) 
-    have False using assms Pfact Qfact by auto
-    then show ?thesis by auto
-  next
-    case Pa
-    have Qfact: "Q = Pa"
-      by (simp add: Pa)
-    have j1: "A4join P Q = {Pa, Ra}" using Pfact Qfact A4join.simps by auto
-    have j2: "A4join P Q = A4PR" using A4PR_def j1  by auto
-    have mP: "A4meets Ra m" using assms Pfact by auto
-    have mQ: "A4meets Pa m" using assms Qfact by auto
-    have ss1: "m = A4PR \<or> m = A4QR \<or> m = A4RS" using mP A4meets.simps
-      by (metis A4Lines_def A4PQ_def A4PS_def A4QS_def a4pt.simps(11) a4pt.simps(3) a4pt.simps(7) insertE singletonD)
-
-      have ss2: "m = A4PQ \<or> m = A4PR \<or> m = A4PS" using mQ A4meets.simps
-        by (metis A4QR_def A4RS_def a4pt.simps(1) a4pt.simps(3) a4pt.simps(5) empty_iff insert_iff ss1)
-
-    have mPQ: "m = A4PR"  using ss1 ss2  A4meets.elims Pfact Qfact assms
-      using A4QR_def A4RS_def by auto
-
-    then show ?thesis using j2 by auto
-  next
-    case Qa
-    have Qfact: "Q = Qa"
-    by (simp add: Qa)
-    have j1: "A4join P Q = {Qa, Ra}" using Pfact Qfact A4join.simps by auto
-    have j2: "A4join P Q = A4QR" using A4QR_def j1  by auto
-    have mP: "A4meets Ra m" using assms Pfact by auto
-    have mQ: "A4meets Qa m" using assms Qfact by auto
-    have ss1: "m = A4PR \<or> m = A4QR \<or> m = A4RS" using mP A4meets.simps
-      by (metis A4Lines_def A4PQ_def A4PS_def A4QS_def Qfact Ra a4pt.simps(11) a4pt.simps(3) assms(1) insertE singletonD)
-     
-    have ss2: "m = A4PQ \<or> m = A4QR \<or> m = A4QS" using mQ A4meets.simps
-      using A4PR_def A4RS_def a4pt.simps(9) ss1 by auto
-    have mPQ: "m = A4QR" using ss1 ss2  A4meets.elims Pfact Qfact assms
-      using A4PR_def A4RS_def by auto
-    then show ?thesis using j2 by auto
-  next
-    case Sa
-    have Qfact: "Q = Sa"
-    by (simp add: Sa)
-    have j1: "A4join P Q = {Ra, Sa}" using Pfact Qfact A4join.simps by auto
-    have j2: "A4join P Q = A4RS" using A4RS_def j1  by auto
-    have mP: "A4meets Ra m" using assms Pfact by auto
-    have mQ: "A4meets Sa m" using assms Qfact by auto
-    have ss1: "m = A4PR \<or> m = A4QR \<or> m = A4RS" using mP A4meets.simps
-      by (metis A4Lines_def A4PQ_def A4PS_def A4QS_def Ra Sa a4pt.simps(3) a4pt.simps(7) assms(1) insertE singletonD)
-
-    have ss2: "m = A4PS \<or> m = A4QS \<or> m = A4RS" using mQ A4meets.simps
-      using A4PR_def A4QR_def  ss1 by auto
-
-    have mPQ: "m = A4RS" using ss1 ss2  A4meets.elims Pfact Qfact assms
-      using A4PR_def A4QR_def by auto
-    then show ?thesis using j2 by auto
-  qed
-next
-  case Sa
-  have Pfact: "P = Sa"
-      by (simp add: Sa) 
-    then show ?thesis
-    proof (cases "Q")
-    case Sa
-    have Qfact: "Q = Sa"
-      by (simp add: Sa) 
-    have False using assms Pfact Qfact by auto
-    then show ?thesis by auto
-  next
-    case Pa
-    have Qfact: "Q = Pa"
-      by (simp add: Pa)
-    have j1: "A4join P Q = {Pa, Sa}" using Pfact Qfact A4join.simps by auto
-    have j2: "A4join P Q = A4PS" using A4PS_def j1  by auto
-    have mP: "A4meets Sa m" using assms Pfact by auto
-    have mQ: "A4meets Pa m" using assms Qfact by auto
-    have ss1: "m = A4PS \<or> m = A4QS \<or> m = A4RS" using mP A4meets.simps
-      by (metis A4Lines_def A4PQ_def A4PR_def A4QR_def a4pt.simps(11) a4pt.simps(5) a4pt.simps(9) empty_iff insert_iff)
-
-      have ss2: "m = A4PQ \<or> m = A4PR \<or> m = A4PS" using mQ A4meets.simps
-        by (metis A4QS_def A4RS_def Qfact Sa a4pt.simps(1) a4pt.simps(3) assms(1) empty_iff insert_iff ss1)
-
-    have mPQ: "m = A4PS"  using ss1 ss2  A4meets.elims Pfact Qfact assms
-      using A4QS_def A4RS_def by auto
-
-    then show ?thesis using j2 by auto
-
-  next
-    case Qa
-    have Qfact: "Q = Qa"
-    by (simp add: Qa)
-    have j1: "A4join P Q = {Qa, Sa}" using Pfact Qfact A4join.simps by auto
-    have j2: "A4join P Q = A4QS" using A4QS_def j1  by auto
-    have mP: "A4meets Sa m" using assms Pfact by auto
-    have mQ: "A4meets Qa m" using assms Qfact by auto
-    have ss1: "m = A4PS \<or> m = A4QS \<or> m = A4RS" using mP A4meets.simps a4pt.simps
-      by (metis A4Lines_def A4PQ_def A4PR_def A4QR_def insertE singletonD)
-    have ss2: "m = A4PQ \<or> m = A4QR \<or> m = A4QS" using mQ A4meets.simps
-      using A4PS_def A4RS_def ss1 by auto 
-      have mPQ: "m = A4QS" using ss1 ss2  A4meets.elims Pfact Qfact assms
-      using A4PS_def A4RS_def by auto
-    then show ?thesis using j2 by auto
-  next
-    case Ra
-    have Qfact: "Q = Ra"
-    by (simp add: Ra)
-    have j1: "A4join P Q = {Ra, Sa}" using Pfact Qfact A4join.simps by auto
-    have j2: "A4join P Q = A4RS" using A4RS_def j1  by auto
-    have mP: "A4meets Sa m" using assms Pfact by auto
-    have mQ: "A4meets Ra m" using assms Qfact by auto
-    have ss1: "m = A4PR \<or> m = A4QR \<or> m = A4RS" using mP A4meets.simps a4pt.simps
-      by (metis A4Lines_def A4PQ_def A4PS_def A4QS_def insertE mQ singletonD)
-
-
-    have ss2: "m = A4PS \<or> m = A4QS \<or> m = A4RS" using mQ A4meets.simps
-      using A4PR_def A4QR_def Sa assms(1) assms(4) ss1 by auto
-    have mPQ: "m = A4RS" using ss1 ss2  A4meets.elims Pfact Qfact assms
-      using A4PR_def A4QR_def by auto
-    then show ?thesis using j2 by auto
-  qed
-qed
-
-(*
-proof -
-  show "\<And>P Q m.
-       P \<noteq> Q \<Longrightarrow> P \<in> A4Points \<Longrightarrow> Q \<in> A4Points \<Longrightarrow> 
-        A4meets P m \<Longrightarrow> A4meets Q m \<Longrightarrow> m = A4join P Q"
-  proof -
-    fix P::a4pt
-    fix Q::a4pt
-    proof (cases "Pair (P, Q)")
-      case (Pair (Pa, Qa))
-      show " \<And>Pa Qa m a b.
-       Pa \<noteq> Qa \<Longrightarrow>
-       Pa \<in> A4Points \<Longrightarrow>
-       Qa \<in> A4Points \<Longrightarrow>
-       A4meets Pa m \<Longrightarrow>
-       A4meets Qa m \<Longrightarrow> (P, Q) = (a, b) \<Longrightarrow> m = A4join Pa Qa"
-      proof -
-   
-  
-  sorry
-*)
-lemma A4line_complement: 
-  fixes l
-  assumes "l \<in> A4Lines"
-  shows "A4complement l \<in> A4Lines"
-  by (smt (verit, best) A4Lines_def A4complement.simps assms empty_iff insert_iff)
-
-lemma A4complement_parallel: 
-  fixes n
-  assumes "n \<in> A4Lines"
-  shows "affine_plane_data.parallel A4Points A4Lines A4meets (A4complement n) n"
-
-proof (cases "n = A4PQ")
-  case True
-  have 0: "n = A4PQ" using True
-    by auto
-  have 1: "A4complement n = A4RS" using A4complement.simps
-    using \<open>n = A4PQ\<close> by auto
-  have 2: "affine_plane_data.parallel A4Points A4Lines A4meets (A4RS) A4PQ = (if (A4RS \<in> A4Lines \<and> A4PQ \<in> A4Lines) 
-  then A4RS = A4PQ \<or> \<not> (\<exists> P. P \<in>  A4Points \<and> A4meets P A4RS \<and> A4meets P A4PQ) else undefined)" using affine_plane_data.parallel.simps 0 1
-  by (simp add: affine_plane_data.parallel.simps)
-  show ?thesis using 2
-    by (metis "0" "1" A4PQ_def A4RS_def A4line_complement A4meets.elims(2) a4pt.simps(3) a4pt.simps(5) a4pt.simps(7) a4pt.simps(9) assms insert_absorb insert_iff insert_not_empty) 
-next
-  show ?thesis
-  proof (cases "n = A4PR")
-
-
-theorem A4affine_plane_a2_alt:
-  fixes P l
-  assumes 
-    "P \<notin> l" and
-    "P \<in> A4Points" and
-    "l \<in> A4Lines" 
-  shows "A4complement l \<in> A4Lines \<and> affine_plane_data.parallel A4Points A4Lines A4meets (A4complement l) l \<and> (A4complement l) \<in> A4Lines"
-proof -
-  have 0: "A4complement l \<in> A4Lines" using A4line_complement assms(3) by auto
-  
-
-
-theorem A4affine_plane_a2: "\<And>P l. \<not> A4meets P l \<Longrightarrow>
            P \<in> A4Points \<Longrightarrow>
+           Q \<in> A4Points \<Longrightarrow>
+           A4join P Q
+           \<in> A4Lines \<and>
+           A4meets P
+            (A4join P Q) \<and>
+           A4meets Q
+            (A4join P Q)" using A4a1a by auto
+  show " \<And>P l. P \<in> A4Points \<Longrightarrow>
            l \<in> A4Lines \<Longrightarrow>
            A4find_parallel l P
-           \<in> A4Lines \<and>
+           \<in> A4Lines" using A4a2a by auto
+  show "\<And>P Q m.
+       P \<noteq> Q \<Longrightarrow>
+       P \<in> A4Points \<Longrightarrow>
+       Q \<in> A4Points \<Longrightarrow>
+       A4meets P m \<Longrightarrow>
+       A4meets Q m \<Longrightarrow>
+       m = A4join P Q" 
+    using  A4a1b  by auto
+
+  show "\<And>P l. P \<in> A4Points \<Longrightarrow>
+           l \<in> A4Lines \<Longrightarrow>
            affine_plane_data.parallel
             A4Points A4Lines
             A4meets
             (A4find_parallel l
               P)
-            l \<and>
+            l" using A4a2a A4a2b by auto
+  show " \<And>P l. P \<in> A4Points \<Longrightarrow>
+           l \<in> A4Lines \<Longrightarrow>
            A4meets P
             (A4find_parallel l
-              P)"
-proof (clarsimp)
-  show "\<And>P l. P \<notin> l \<Longrightarrow>
-           P \<in> A4Points \<Longrightarrow>
-           l \<in> A4Lines \<Longrightarrow> A4Points - l \<in> A4Lines \<and> affine_plane_data.parallel A4Points A4Lines A4meets (A4Points - l) l \<and> A4Points - l \<in> A4Lines" 
-  proof -
-    fix P
-    fix l
-   show "P \<notin> l \<Longrightarrow>
-           P \<in> A4Points \<Longrightarrow>
-           l \<in> A4Lines \<Longrightarrow> A4Points - l \<in> A4Lines \<and> affine_plane_data.parallel A4Points A4Lines A4meets (A4Points - l) l \<and> A4Points - l \<in> A4Lines" using A4affine_plane_a2_alt 
-     using  A4affine_plane_a2_alt by auto
- qed
+              P)"  using A4a2c by blast
+  show "\<exists>P Q R.
+       P \<in> A4Points \<and>
+       Q \<in> A4Points \<and>
+       R \<in> A4Points \<and>
+       P \<noteq> Q \<and>
+       P \<noteq> R \<and>
+       Q \<noteq> R \<and>
+       \<not> affine_plane_data.collinear
+           A4Points A4Lines
+           A4meets P Q R" using A4a3 by auto
 qed
 
-theorem A4affine_plane: "affine_plane A4Points A4Lines A4meets A4join A4find_parallel"
-proof standard
-  show f1a: "\<And>P Q. P \<noteq> Q \<Longrightarrow> P \<in> A4Points \<Longrightarrow> Q \<in> A4Points \<Longrightarrow> A4join P Q \<in> A4Lines \<and> A4meets P (A4join P Q) \<and> A4meets Q (A4join P Q)" 
-    using A4affine_plane_a1a by auto
-  show f1b: "\<And>P Q m. P \<noteq> Q \<Longrightarrow> P \<in> A4Points \<Longrightarrow> Q \<in> A4Points \<Longrightarrow> A4meets P m \<Longrightarrow> A4meets Q m \<Longrightarrow> m = A4join P Q"
-    using A4affine_plane_a1b by auto    
-  show f2: "\<And>P l. \<not> A4meets P l \<Longrightarrow>
-           P \<in> A4Points \<Longrightarrow>
-           l \<in> A4Lines \<Longrightarrow>
-           A4find_parallel l P \<in> A4Lines \<and>
-           affine_plane_data.parallel A4Points A4Lines A4meets (A4find_parallel l P) l \<and> A4meets P (A4find_parallel l P)"
-    using A4affine_plane_a2 by auto    
-  show f3: "\<exists>P Q R. P \<in> A4Points \<and> Q \<in> A4Points \<and> R \<in> A4Points \<and> P \<noteq> Q \<and> P \<noteq> R \<and> Q \<noteq> R \<and> 
-    \<not> affine_plane_data.collinear A4Points A4Lines A4meets P Q R"
-    using A4affine_plane_a3   by auto
-qed
+end
+
