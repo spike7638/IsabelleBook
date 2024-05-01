@@ -140,6 +140,7 @@ the further properties we shall list).
 explicit constants for any numbers except Z and U. We can still, however,
 mimic this computation, just in greater generality. Show that
 if x + a = b, then x = b - a, following Spivak's computation. *)
+find_theorems neg
 
 lemma insert_name_here: 
   fixes x::r and a and b
@@ -474,7 +475,7 @@ lemma neg_sum:
 (* jfh: this is the result Spivak describes as "slightly more interesting" 
 near the end of the material before the traingle inequality *)
 lemma slightly_more_interesting:
-  fixes a b c
+  fixes a b c 
   assumes "lt a b"
   shows "lt (a  \<oplus> c) (b  \<oplus> c)"
   sorry
