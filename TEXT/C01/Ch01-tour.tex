@@ -1,0 +1,341 @@
+\chapter{A tour of Isabelle, and a first proof or two}
+\section{Introduction}
+Let's take a quick tour of the Isabelle interface, learn a little bit about how to enter text into an Isabelle document, and write a proof of a simple theorem (using tools you won't completely understand because this is a quick tour, not a tutorial). That will give us a chance to see how Isabelle relates to the mathematics you're used to writing. 
+
+This tour will need to introduce things at a bunch of levels -- how do you type that character? What do the colors mean? What kinds of math can I type at \textit{this} point in the file? I'll be answering \textit{some} of the questions at each level, the ones I think are most important for getting started. But you should be prepared to finish the chapter with a lot of unanswered questions.
+
+If you start Isabelle 2023, you'll see an interface that looks like this:
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{TEXT//C01//Images/interface.png}
+    \caption{The Isabelle interface (as of May 2024)}
+    \label{fig:C1-interface}
+\end{figure}
+In the left column are various documents you can look at. About halfway down, in bold, is \textbf{prog-prove}\textit{\textbf{,}} a book about programming and proving in Isabelle/HOL, which will almost certainly be useful to you at some point, as it is to me. But when I first tried reading it, I rapidly gave up and decided that someone needed to write \textit{this} book instead. 
+
+The top half of the center column is an Editor -- in it you can type Isabelle documents (which Isabelle folks call \term{theory documents} or \term{proof documents}). As you do so, other threads of execution are constantly processing what you've written and changing the appearance of the editor text -- perhaps color-coding some text, or making red marks along the right-hand side of the document, or generating \textit{output}, which is one of the things that you can see in the other center-column window at the bottom. You can see above that I've got \sys{Output} highlighted; you can actually select \sys{Query}, \sys{Sledgehammer}, or \sys{Symbols} instead. For now, let's stick with \sys{Output}. 
+
+Right here I want to have you do something important. Near the top right of the 
+\sys{Output} panel, you can see this:
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\linewidth]{image.png}
+\end{figure}
+\textit{Be sure that \sys{Proof state} and \sys{Auto update} are both checked.} In everything I write from now on I'll assume that you've done this, so do it now! [Why? Because as you work, you'll constantly be looking at this panel, and having it update as you type, rather than requiring a cursor-motion-and-click, is really nice. Checking \sys{Proof state} says that you'd like to see a little more than the bare minimum feedback, which saves you from looking at \textit{another} panel all the time.]
+
+Moving on, there's the column on the right. \sys{Auto update} is checked, because that's how you'll usually want things. Along the right hand side are choices of what to display in the main panel of that column: \sys{Hypersearch Results}, \sys{Sidekick}, \sys{State}, or \sys{Theories}. For now, we'll go with \sys{State}. Down at the bottom are some bits of information: the current time, how much memory various parts of Isabelle are using, etc. 
+
+In the middle column, the top panel has a file-name at the top (\co{Untitled-1 (\~/)}; if you look to the right of that filename, you'll see a down-arrow that you can click to discover that there may be other editor buffers available for you to look at as well. When I click on mine, I see this:
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{file-list.png}
+\end{figure}
+which tells me that in addition to the \co{Untitled-1} document, I've also got open \co{Scratch.thy}. By moving my cursor over that and releasing, I can switch to showing that document if I like. Using the \sys{File} menu, you can open a new document (it'll be called \co{Unititled-2}) and toggle between the two of them if you like.
+
+In general, dropdowns like this abound. There's another at the top of the lower center panel, and near the top of the right panel. 
+
+It'd be nice to start writing a theorem and proof, but such things must be contained in a \textit{theory file} for Isabelle to process them. So let's save Untitled-1 (type command-S (Mac) or ctrl-S (Windows)) to do so. You'll see a dialog appear. Mine shows that the file will be saved in /Users/jfh, but I could navigate around to save it somewhere else. It also shows (at the bottom of the dialog box) that the file will be called "Untitled-1":
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{file-chooser.png}
+\end{figure}
+Let's change that to "IBookCh1.thy", where IBook means "Isabelle book", "Ch1" means "Chapter 1", and ".thy" is the extension \textit{required on all theory files}. Without this extension, nothing will work. So let's suck it up and type it in:
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\linewidth]{file-name-edit.png}
+\end{figure}
+and click "Save". 
+
+Two things happen: the document title at the top changes to "IBookCh1.thy (\~/)", and the cursor in the document becomes bright red:
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{interface-file-response.png}
+\end{figure}
+Less obvious is the appearance of a purple line down the left side of the document. 
+
+\digression[File paths]{
+The filename above makes sense, but what about the \co{(~/)} after it? In Unix-like operating systems like MacOS, every user has a "home directory" where their files are stored. In my case, that directory is \co{/Users/jfh}. But there's a Unix-standard abbreviation for that, namely a tilde. So \co{\ ~/names.txt} is a way of describing a file called \co{names.txt} that's in my home directory. In the snapshot above, what you're seeing is that there's a file called \co{IBookCh1.thy} in my home directory, the 'directory path' being shown in parentheses at the right. }
+
+\digression[File names]{
+The filename may have made sense, but it's not very readable. Why not use some blanks, or hyphens to improve readability? Because those cause problems for Isabelle. Stick with letters, numbers, and underscores in your file names (except for the \co{.thy} at the end, of course).}
+
+We can now start creating our theory document. There are very strict rules for this, rules that I'll enumerate in a little while, but for now, we're just going to type. Here's a start for our theory:
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.25\linewidth]{first-theory.png}
+    \caption{A first theory document}
+    \label{fig:first-theory-doc}
+\end{figure}
+The theory \textit{must} start with the word \isi{theory}; the theory's name comes next, and it must be exactly the same as the non-extension part of the filename (i.e., the filename except for the \co{thy} at the end). Then comes the keyword \isi{imports}, and then a \isi{begin-end} pair. Isabelle kindly makes keywords be shown in boldface, and does some automatic indentation for us.  As we add more to our theory, the new material will go between the \isi{begin} and the \isi{end}. I've also put a blank line after the end, and my cursor, highlighted in red, is on that line. 
+
+To the left are two small markers that look like a circle with a "-" in it, and then a line with a hook. These represent collapsable parts of the document. If I click on the top circle, the display changes to this:
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{condensed-theory.png}
+    \label{fig:enter-label}
+\end{figure}
+\noindent which tells you that the first bit of the file has been "folded up" and 1 line is now hidden. I can expand it again by clicking on the circled "+". This can be helpful in longer documents for hiding all except the part that you're interested in at some moment. 
+
+By the way, "imports Main" means that we'll have all sorts of useful facts at our disposal when we want to start writing and proving theorems. An example of this "useful stuff" is the natural numbers, 0, 1, 2, … and so on. Those have been defined, and various facts about them proven already, and the theory called "Main" contains these definitions and proofs. (The real and complex numbers are \textit{not} defined in Main, by the way -- for that you need Complex\_Main.) You can also leave the space after "imports" blank, but you'll find it's hard to do much of anything, because so many essential tools are in Main.
+
+Every theory file needs an "imports" line. If you want to import more than one theory, you just write them one after another, separated by spaces. So 
+\begin{IS}    
+imports Main Complex\_Main
+\end{IS}
+\noindent
+is also valid. If you typed
+
+\begin{IS}    
+imports Main Tigers
+\end{IS}    
+\noindent
+it'd be a problem, though, because there isn't a theory called \isi{Tigers}. Your interface would look like this:
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\linewidth]{tigers.png}
+\end{figure}
+And down below, in the Output panel, you'd see this:
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\linewidth]{tiger-error.png}
+\end{figure}
+Or at least you would as long as your cursor was on the 'imports' line as shown above. 
+
+What's going on here is that as you're typing, a separate process is interpreting what you've typed, and it's found an error. The red circle with the exclamation point at the left shows the line containing the error. The wiggly red underlining indicates the exact first place the problem occurs. The pink bar to the right with the red rectangle is a schematic picture of your whole document (it's all pink because none of it 'works' as a theory file right now), with the location ('near the top') marked with a red bar to tell you where the problem is happening. When your file is 300 lines long, that schematic picture can help you find an error quickly. 
+
+How do you know what theories are available (e.g., Complex\_Main) and what theories are not (Tigers)? We'll come back to that. Isabelle has various excellent search tools to help with this kind of question. For now, let's get rid of the Tigers so that our theory file is once again valid. 
+
+We're now going to state and prove a basic theorem about natural numbers: For any natural number k, there's an \textit{even} natural number (i.e., one of the form 2n) greater than k. 
+
+\textbf{Task}. I'd like you to pause a moment and think about how you'd prove that. Go ahead and actually write out a proof. (Seriously: do it!) Soon, we'll look at several possible proofs, and chances are good that yours will be among them. 
+
+To separate that task from my own list of possible proofs, I'll go ahead and talk about how to write this theorem in Isabelle. Between the "begin" and "end" in the theory file, type this: 
+\begin{IS}
+lemma evens: "\<exists> (n::nat) . 2*n > (k::nat)"
+\end{IS}
+To do this requires writing a 'there exists' symbol, the inverted E. You do that in Isabelle by typing one of three things:\marginnote{The peach-colored background is there because the isabelle-formatting code used to produce this book converts `\textbackslash\textless exists\textgreater' into the backwards-E, so I had to use a different style.} \isi{EX} or \co{\\<exists>} or \isi{\exists} -- and then pausing until a tooltip offering up the inverted E as a replacement appears. When it does, hitting TAB will complete the replacement. For this particular example, I've included text, and you can simply copy/paste it into the theory file if you choose to do so.
+
+What does the stuff you just typed \textit{mean}? First, \isi{evens} gives a name to your theorem, which you'll be able to reference later. (Isabelle doesn't require a name, but from force of habit, I always name things, and I think it's a good idea.)\marginnote{Often typing some backslash-prepended name will make Isabelle offer \textit{several} replacement options. You can use arrow-keys to move up/down in the list, and then TAB to select one. It appears to me that repeatedly using one replacement will cause it to rise up in the list of choices, at least for a while.} Second, \isi{n::nat} means that \isi{n} is a name for something of type \isi{nat}. This \isi{nat} is the \textit{type} (defined somewhere in \isi{Main}) for the natural numbers. So the first bit is saying ``There's a natural number, $n$, \ldots'', and it's followed by a property of that natural number. The division between the name associated with the `there exists' and the property is the period. So now we can read ``There exists a natural number $n$ \textit{such that} $2n$ is greater than the natural number $k$.'' 
+
+Most mathematicians would prefer to say ``for any natural number $k$, there's a natural number $n$ such that $2n > k$,'' and would find the introduction of $k$ at the end of the lemma-statement a bit weird. 
+
+Two things are going on here.
+
+The color-coding tells you some of it. A variable associated with an ``exists'' or ``forall'' is said to be a \term{bound variable}, and they show up in green, as happens with $n$ above. Here's another lemma in which \textit{two} variables are bound by a single ``exists'':
+
+
+It's a stupid lemma, but it shows the green highlighting. 
+
+In the \isi{evens} lemma, the variable k is \textit{unbound}, so it's shown in blue. And a rule in Isabelle is that any statement like this involving an unbound variable is implicitly universally quantified over that variable, so that this lemma is really saying "for any natural number $k$ …." even though that isn't written down anywhere. There's a sneaky detail about the exact nature of that "for any", but I'm going to sweep it under the rug for now. 
+
+Again, while you were typing, another process was interpreting and recoloring. Things now look like this:
+
+The red exclamation and the red bar at the right tell you something is wrong. Even without looking at the Output panel below, you can guess what it is: you've asserted this lemma, but haven't provided a proof. In fact the very act of asserting it put Isabelle in a different mode -- one where it wants a proof, and instead it encountered "end". The output panel tells you this:
+
+There are three things you can do to fix this:
+
+\begin{itemize}
+    \item Write a proof of the lemma
+    \item Give up on the lemma by typing "oops" after it, which says to Isabelle "I don't know how to prove this, so just forget I ever mentioned it, OK?" 
+    \item [risky] assert that you'd like to \textit{pretend} you have a proof, so that you can use this lemma in further work, and you'll get back to proving it properly later. For this, you type "sorry".
+\end{itemize}
+
+Obviously the first of these is the best choice, but sometimes we get frustrated and just need to think some more, so the second is a reasonable option: we get to keep the statement of the theorem there in the file so we don't have to remember how to retype those characters, etc., but it doesn't 'pollute' anything. The third is the worst: we treat this unproved thing as if it were true, and use it in subsequent work. Maybe we do this because we're sure we can prove it \textit{eventually}, and this lets us make progress. But it's also possible that we've stated it improperly, and as stated, it's actually false! Then we've effectively introduced a new axiom --- that some false statement is true --- into our system, and from that we can prove anything. That's a terrible thing to do to ourselves. Keep that in mind before you use "sorry." [I give this warning because I've done this exact thing! On the other hand, I also use 'sorry' sometimes when I should use 'oops'. I'm human, after all.] 
+
+\textbf{Task}: For now, though, try the experiment. After the lemma, type "sorry". It'll get highlighted in pink, but you can move on. In fact, you can type ' thm evens ', which is a way of asking Isabelle to tell you what it knows about a theorem called "evens": 
+
+And down in the Output panel you'll get a result:
+
+That result looks at least somewhat like our theorem. There's a weird question-mark thing going on, and there's no "forall k" even though I said Isabelle had one implicitly, and the inequality has been swapped around to use "<" instead of ">", but it's clearly our theorem there on display. All three of these oddities are things that just happen in Isabelle (for good reasons!), and soon you won't notice them as much as you do at first. 
+
+To finish up, go back and remove both the "thm" line and the "sorry" before it. We've got a lemma stated, and we need to prove it. 
+
+Before we do so, here are some possible proofs:
+
+\begin{itemize}
+    \item Just pick n = k + 1. It's clearly a natural number, and twice it is obviously larger than k (even in the limiting case where k is zero). 
+    \item Consider the cases k = 0 and k > 0. In the first case, n = 1 satisfies 2n > k In the second, from k > 0 we can add k to both sides to get 2k > k, so n = k satisfies the theorem.
+    \item Induction. Again the case k = 0 is trivial. Suppose that for some k > 0 we have a number m with 2m > k. We'll show that there's a number n with 2n > k+1, thus completing the inductive step. Indeed, it's easy: pick n = m + 1. Then 2n = 2m + 2  > k + 2 (by assumption) which is in turn > k + 1. 
+\end{itemize}
+
+Your proof was probably one of these, but there are surely others. 
+
+Let's see one of Isabelle's strong points right here. We're going to ask it to find a proof, and it's going to try a bunch of strategies -- simplification, 'tableau solvers', a reasoner for linear arithmetic, something called a SAT-solver, etc., etc., -- and see what it can come up with. Typing the word "try" makes all this happen. Sadly, especially for new users, "try" sometimes reports that a proof is easy, but doesn't tell you what to type, which is infuriating. Much nicer is "try0". So right after our lemma, we'll type "try0" and wait for a moment:
+
+A moment later, down in the "Output" panel, we see this:
+
+Apparently a proof-method called "presburger" has found a proof. So we can click on the highlighted "by presburger" and it'll be pasted into the buffer. We'll need to backspace out the "try0" to end up with this:
+
+And down in the output window, we have this:
+
+We've got a theorem (stated a little oddly) and it's been proved. We're done! 
+
+We might, however, be unsatisfied. None of us thought up a proof where we just said "by presburger", right? Maybe we'd like to use one of the proofs that \textbf{we} came up with, so it can be instructive for future students (not to mention being clear!). We'll do that in a moment, but first let's talk about "try0".
+
+The nice thing about "try0" is it usually works fast \textbf{if} it's going to work. And if it \textit{does} work, you can be pretty sure you've stated the theorem right. You may still want to work out a different proof, but at least you've got some confidence. The sad thing about "try0" is that sometimes it seems to be unable to prove the most obvious stuff, but to be honest, that's usually because you're using it wrong. More on this later. 
+
+There's also that question-mark in front of "k". How did \textit{that} get there, and what does it mean? Again, we'll look at that later. 
+
+Now let's try to do another proof of this theorem. 
+
+\textbf{Task}: Copy-and-paste the theorem, and change the name "evens" to "evens2". Move your cursor to the next line and wait a moment, and in the Output panel, this appears:
+
+Isabelle has done a bit of looking ahead and realized this theorem is particularly easy to prove: it's a consequence of the lemma immediately above (which it has called IBookCh1.evens, because we gave it the name "evens", and it's in a document called IBookCh1.thy). Unfortunately, it has \textit{not} said how to actually write the proof in Isabelle -- the sort of thing that try0 might have helped with. It turns out that the magic incantation is "using evens by auto"
+
+(although simp and blast could be used instead of auto --- any one of them is capable of making the leap from the statement of "evens" to the statement of "evens2"!)
+
+Let's try to do one of our \textit{own} proofs of the theorem. Once more, copy-paste the theorem statement and change the name, this time to "evens3". With your cursor after the theorem, the Output panel should now be offering you two ways to trivially prove your theorem, but we're going to ignore those. The "State" panel in the right-hand column is showing this:
+
+That's telling you a lot. Isabelle has two main modes, 'state' and 'prove'. (Those are both verbs, not nouns!) In the first, it wants you to state something (which you'll then prove); in the second, it wants you to set about proving one or more things; those things are called \textit{goals} or \textit{subgoals}. In this particular case, we have one goal, which is our current theorem-statement. 
+
+Our prior two proofs are kind of "shortcut proofs",  a little bit like when a brief discussion in a textbook concludes with "we have just shown the following…", which is followed by some lemma with no further proof. From now on, we're going to mostly avoid those. 
+
+To produce the standard kind of proof that we'll generally aim for, we start with the keyword "proof", followed by something that tells what kind of proof we plan to write (induction, case-analysis, …). It's also allowable to indicate that we don't have a particular standard-strategy in mind, in which case we write "proof -"
+
+\textbf{Task}: Add the line "proof -" below your lemma statement and describe how the Output and State panels have changed. 
+
+We're obliged, at this point, to state something. (Why? Your answer to the previous task should tell you!) We'll generally do so using one of two constructs: "have" and "show". The "have" construct is for when you want to say something that'll be useful ("u has a unique factorization") but which isn't one of the current goals. The "show" construct is for when you want to actually establish the truth of some goal (or "refine" it -- more on this later). 
+
+Let's commit to one of the proofs, namely
+
+Just pick n = k + 1. It's clearly a natural number, and twice it is obviously larger than k (even in the limiting case where k is zero). 
+
+In this case, we're saying that 
+
+\begin{enumerate}
+    \item 2(k+1) > k (we'll need to prove that), and 
+    \item thus there exists a number n with 2(n) > k. 
+\end{enumerate}
+This is a pretty typical situation. We have some proposition (in this case P(n): 2n > k), and we want to show that there's some n for which this proposition is true, i.e., we want to show
+
+Exists n . P(n)
+
+We plan to do so by showing that there's a \textit{particular} n for which this is true. From a logic point of view, we're asserting that
+
+P(b) implies Exists n . P(n)
+
+And indeed, this is one of Isabelle/HOL's rules for proving things. So let's first establish the truth of the left-hand side here, i.e., exhibit a value of n for which P(n) is true. (We have one in mind, of course -- k+1, right?) So we want to say
+
+have 2(k+1) > k
+
+I.e., "we have, as a true-but-yet-to-be-proved, fact that for our natural number k, 2(k+1) > k." Here "have" is a keyword, and will show up (like "begin" and "end" and "lemma" and other things you've seen) in a bold font in the interface. On the other hand, "2(k+1) > k" is not a part of Isabelle's language/logic. The general rule is "stuff like that gets double-quotes", so we write
+
+have "2*(k+1) > k"
+
+\textbf{Task}: Go ahead and type that on a line by itself and note the change in the Output and in the State panels. Note: the "star" for multiplication is essential. Try deleting it and see what kinds of error messages appear; then replace it. Remember this experience though, because sometime in the future you'll again mis-type something in these double-quotes and get a similar error message, which may seem cryptic until you realize that you need to be really careful in writing math for Isabelle.
+
+When we're marshaling facts like this (it's not really a 'fact' yet because we haven't proved it!) it's nice to give them names. We'll see why in a moment. In this case let's give it the name 'example', by writing
+
+have example: "2*(k+1) > k"
+
+\textbf{Task: }Try replacing the name "example" with "instance". What goes wrong? 
+
+We now have a subgoal to prove, and as it's mere algebra without any exponents, 'simp' can probably handle it. We add "by simp" on the next line, and see what happens. The Output looks like this:
+
+We have a fact called "example"; the current state of things is that we know a fact (the most recent fact is called "this"), and we have a \textit{goal} that we still haven't proved, so we're obliged to do so. With our fact in hand, this \textit{should} be easy. (Note, by the way, that Isabelle has reversed the direction of the inequalities; it always replaces greater-than with less-than!)
+
+This time, we want to assert the overall goal as the next thing to prove, and because we're demonstrating the proof of some \textit{goal}, we use "have" instead of "show". We \textit{could} retype the overall goal (or copy-paste it from the output panel!) as in 
+
+But it's more idiomatic to write this:
+
+That "?thesis" is shorthand for "the most recent thing we promised to prove", more or less. 
+
+We can complete the proof with "using example by blast". The "using" adds the fact we called 'example' to the set of things Isabelle can work with, and "blast" does reasoning that includes things like " P(a) => exists x . P(x) "
+
+A challenge for beginning Isabelle-users is figuring out "by WHAT???", because there's simp, auto, blast, metis, … and (a) each of them overlaps with the others to some degree and (b) the names don't really disclose what each one does unless you know more about logic-and-computation than do most mathematicians. I confess that I often use "try0", so in this case I'd type "using example try0". The result is a flood of successful proofs:
+
+You can see that this is an easy problem for "blast", and harder for "fastforce", and even harder for "presburger" (indeed, that last approach is probably ignoring our 'example' fact and just proving the whole theorem from scratch as it did in the first lemma, "evens"). 
+
+And while I \textit{do} use "try0", I also try to \textit{avoid} using it and get a feel for which solver is the 'right' one, as I did when using "simp" to show that 2*(k+1) > k. 
+
+So now we have a complete proof:
+
+With the cursor in the position shown, the Output panel says "No subgoals!" and we can add "qed", which is like a closing-parenthesis for "proof". If you move your cursor up and down through the proof, you can see how the output changes after each line. 
+
+You will soon grow to love seeing "No subgoals." It's like being able to check an item off your list of things you need to do -- it feels good! And just as some people enjoy that so much that they begin adding tiny tasks ("Find Shovel") to the list before larger ones ("Shovel snow off driveway"), you may find yourself so eager to see "No subgoals" that you begin proving small things on the way to larger ones. Fortunately, this is an \textit{excellent} strategy in Isabelle. 
+
+Returning to the lemma we're working on, if you change the method used to show ?thesis, something a bit surprising happens. Change 'blast' to 'auto' (which cannot in fact do the proof) and you'll once again see that there are no goals left. But something critically important has happened -- red error bars appear on the right-hand side, indicating that this is a place where problems remain. Furthermore, down in the Output panel there's an error message telling you that no proof was found. 
+
+What's going on here is that there are multiple threads of execution interacting with this UI, and at least one of them is saying "well, if you say that you've shown something, I guess I'll trust you" and says that there are no further goals. Another thread might be off looking for a proof of that claim, and simply not have finished the job. (In our case it \textit{has} finished and failed to find a proof, but the idea's the same.) This somewhat peculiar behavior can be both a benefit and a curse. You should get accustomed to looking at those red or pink bars on the right to be sure things have gone as well as you might think that they have. 
+
+Speaking of that, when you load a big theory file -- hundreds of lines perhaps -- you'll see a pink bar at the right indicating that Isabelle has not checked the theory for correctness. Soon the top of that bar will turn white --- Isabelle has checked the part that's visible in the editor panel. As you move your cursor down in the editor, more and more will turn white unless you encounter an error or a place where the proving takes a while to complete. 
+
+\subsubsection{Two more proofs}
+
+We have two more proofs of our lemma still waiting in the wings. Here they are, encoded in Isabelle, for you to look at. I'm not going to explain them in the same detail as the first proof, but you should type them in and step through them, watching how the proof-state changes with each line, as a way of getting a feel for two other proof strategies. 
+
+By the way, none of the proofs in this Chapter should be considered models of compactness or excellent style. They're straightforward and somewhat wordy and show some basic Isabelle tools using only a few keywords, and that's intentional. I want to set you up to be able to construct a few more proofs of simple statements on your own. They also follow some conventions like 
+
+\begin{itemize}
+    \item putting the theorem-name in double-quotes) that are non-standard, but which help prevent certain classes of errors that can trip up newcomers
+    \item Annotating with (* … *) comments to explain what's going on; usually Isabelle proofs aim for brevity rather than readability.
+\end{itemize}
+
+To continue with our small theorem, we have two more proofs: 
+
+Consider the cases k = 0 and k > 0. In the first case, n = 1 satisfies 2n > k In the second, from k > 0 we can add k to both sides to get 2k > k, so n = k satisfies the theorem.
+
+Induction. Again the case k = 0 is trivial. Suppose that for some k > 0 we have a number m with 2m > k. We'll show that there's a number n with 2n > k+1, thus completing the inductive step. Indeed, it's easy: pick n = m + 1. Then 2n = 2m + 2  > k + 2 (by assumption) which is in turn > k + 1. 
+
+If that last proof looks only superficially like induction to you, you're in good company. You can certainly see that things fall into a base case and an inductive case, and the "assume P(k)" part of things is somehow all automatically laid out by saying "case (Suc k)". The rest probably feels just a bit weird, and that's OK. Induction in Isabelle is very general and very powerful, but is therefore also a little challenging to use in simple cases.
+
+We've also used "obtain" here. Remember how I said that there's a rule "P(b) => Exists x . P(x)", so that writing down one example for which P is true suffices to show the "there-exists" claim? "Obtain" is the counterpoint to that: it says  that if you know there's an x with P(x) being true, then you can create a name for such an x and use it in the rest of your proof. As an example, the intermediate value theorem says that if f is a continuous function from the reals to the reals and f(0) > 0 and f(1) < 0, then f(x) = 0 for some x between 0 and 1. If we'd proved this theorem in Isabelle, we could write 'obtain c where f(c) = 0" and use c in the remainder of some proof.  
+
+Let's review a few key points from this chapter:
+
+\begin{itemize}
+    \item The UI has three panels -- the editor, the proof-state, and the output -- that you'll use a lot while creating theory files
+
+\begin{itemize}
+        \item Color-coding and automatic formatting of text tell you a \textit{lot} about what's going on
+        \item There are multiple processes acting on the UI at any moment, and their interaction can occasionally be surprising. 
+        \item \textit{\textit{Always} pay attention to anything that's red!}
+\end{itemize}
+
+    \item Theory-files have a fixed structure; the name of the theory must match the name of the file; the name of the file must end in ".thy", and the theory name should contain only letters, digits, and underscores. 
+    \item Isabelle uses a lot of special symbols. You've learned how to type one of them using the "type something, pause, and then hit TAB" approach, but you'll need to learn more. 
+    \item Theory-files have a block structure: each "proof" must be matched by a "qed"; each "begin" must be matched by an "end"
+    \item If you can't prove something, "oops" is a good way to tell Isabelle to forget all about it. "sorry" is a less-good way, but frequently useful.
+    \item Non-keyword text in an Isabelle document generally needs double quotation marks around it. (We'll learn later that "cartouches" are also allowed, and that in many cases we can skip the double-quotes, and folks generally do so.)
+    \item You've seen two forms of "proof", one of which omits the word "proof" and simply says something like "by auto"; the other one starts with "proof" and ends with "qed"
+    \item Within proofs, there are various 'provers' named simp, auto, blast, metis, etc., that are good at different things, and you'll need to learn which ones are good at which things. For now, that's just a big pile of words. 
+    \item When you're in a state of affairs that requires a proof (the proof-state panel says "proof (prove)"), you can type "try" or (better in general) "try0" to see whether Isabelle can find an easy proof for you. 
+    \item Proofs can have various structures (cases, contradiction, induction, …) and each has its own way of being written in Isabelle. 
+    \item During a proof, there are goals and subgoals, and your aim is to eliminate all of them. 
+    \item You've learned about quite a few Isabelle keywords -- theory, imports, begin, end, lemma, using, by, proof, have, show, case, let, obtain -- although the details of most are still to be disclosed. 
+    \item You're ready to do some proofs on your own as "homework" or better, as "drill" to help get some patterns into your head. 
+\end{itemize}
+
+Finally, I want to note that absolutely nothing we've done so far matches a typical use of Isabelle by an expert -- an expert would have started out any project by searching through Isabelle's known theorems (using its powerful search tools!) to see whether the thing they're trying to prove is already known, or at least something \textit{similar} is known and can be used as a starting point. We'll get to this kind of proving later. 
+
+\subsection{Homework Exercises}
+
+\begin{enumerate}
+    \item Create a new theory file to hold a theory called HW1. What should the name of the file be? Make sure to follow the naming rules.
+    \item Type enough into the file to make it a valid theory file (i.e., something beginning with the word "theory" and ending with "end", and having all keywords highlighted by Isabelle.)
+    \item Here's a tiny theorem: \textit{For any natural number n, there's an odd number larger than n. }And here's a proof:\textit{ The number 2n + 1 is an odd number larger than n. }
+
+State and prove this theorem using this proof, in Isabelle, using a proof that starts with the word "proof" rather than just "by". Call your theorem "odds".
+    \item Here's another theorem: The square of any natural number is nonnegative. State and prove this in Isabelle. To write the square of a number b, for now just use b * b. Hint: to get the "greater-than-or-equal" symbol, type "\textbackslash{}ge" and pause until a completion/substitution is offered, and then press TAB. And to indicate that n is a natural number, use "n::nat", which must be in parentheses to make parsing reasonable. Go ahead and use a "by" proof, because you don't yet know how to find a theorem that says that the product of non-negatives is non-negative, or that naturals are closed under multiplication, but both are true and known within Main. Looking at the hints provided by Auto solve\_direct will give you some feel for the kinds of facts that are available to you. 
+    \item \textbf{(Can't do yet; replace with a different example)} Here's a slightly more complicated theorem: For any natural number n, n\^2 - n + 1 is positive. Here's a proof:
+
+\begin{enumerate}
+        \item When n = 0, the expression is 1, which is > 0. 
+        \item For n > 0, write  n\^2 - n + 1 = (n-1)\^2 + n; this is greater than (n-1)\^2  [why greater than rather than "greater than or equal to"?|, which must be nonnegative by the previous theorem. 
+        \item Therefore n\^2 - n + 1 must be actually positive and we're done. 
+\end{enumerate}
+
+\end{enumerate}
+State and prove the theorem (using this proof) in Isabelle. (By the way, this theorem can \textit{also }be proved using "by auto", although Auto solve\_direct doesn't find that proof.)
+
+Lagniappe
+
+Just as the red circle with an exclamation in the left edge of a theory document signals an error, a blue circle with an "i" in it tells you that Isabelle has something you might want to know, as in 
+
+Clicking on the blue i-marker shows a message in the output panel:
+
+ 
+
+Pointer to isabelle community cookbook: https://isabelle.systems/cookbook

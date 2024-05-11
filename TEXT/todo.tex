@@ -1,0 +1,92 @@
+\chapter*{To Do}
+\begin{itemize}
+\item using sliedgehammer: put after "using" or "unfolding" or "have ..." or "show ..." but NOT after "by"
+
+\item Restructure into chapters
+\item Move style files to subdirectory
+\item Make all latex intermediate files be ignored by git
+\item define displayed-code macro: Perhaps IC for displayed code? 
+\item Figure out image inclusion
+\item add section on cartouches
+
+\item +For the "sys" and "co" languages, make sure that all characters are un=special (e.g., tildes!)
+\item .get bibliography working
+\item .get non-keyword text in Isabelle source to be ttfamily as well (e.g. presburger)
+\item .Define digression-box (add "digression" header)
+\item .fix quotes in Isabelle code to be stupid quotes
+\item .define clean inline-isabelle macro 
+\item .Reduce left margin; increase right margin so marginpars can fit.
+\item .get Sys language definition working: fixed wdth font, pale blue background
+\end{itemize}
+
+Example citation: \cite{latex2e}.
+
+\begin{verbatim}
+Book design:
+Digression: footnote with highlighted background, or margin paragraph
+Code: both inline and displayed, in an Isabelle-like format
+Topic coloring? Interface, proving, logic, syntax (?)
+Chapter summary and high points at end of each chapter
+
+
+Marginnotes
+=====
+
+Homework files: 
+ChXX_HWxx_topic.thy
+ChXX_HWxx_topic_sol.thy [solutions]
+
+Sample files
+ChXX_Sxx_topic.thy
+ChXX_Sxx_topic_sol.thy
+
+Code-image-files:
+Org by chapter
+xxx_topic.png
+Xxx.xx_topic.png  (later additions inserted out of sequence)
+
+Scratch files
+CHXX_scratchxx
+
+\end{verbatim}
+
+
+\ignore{ 
+Example of a digression:
+
+\digression{Lorem   ipsum. Lorem   ipsum. Lorem   ipsum. Lorem   ipsum. Lorem   ipsum. Lorem   ipsum. Lorem   ipsum. Lorem   ipsum.Lorem   ipsum.Lorem   ipsum.Lorem   ipsum.Lorem   ipsum. }
+
+Example of a digression-with-topic:
+
+\digression[unit measures]{Lorem   ipsum. Lorem   ipsum. Lorem   ipsum. Lorem   ipsum. Lorem   ipsum. Lorem   ipsum. Lorem   ipsum. Lorem   ipsum.Lorem   ipsum.Lorem   ipsum.Lorem   ipsum.Lorem   ipsum. }
+And a todo: \todo{remove this}
+
+Example of sys code: \sys{ls ~jfh}.
+
+Example of Inline Isabelle code \isi{theory IbookCh0} and general Isabelle code:
+}
+\lstset{language=Isabelle}
+\begin{lstlisting}
+
+theory IbookCh0
+  imports Main EX
+begin
+\end{lstlisting}
+\ignore{
+lemma "evens": "\<exists> (n::nat) . 2*n > (k::nat)"
+  by presburger
+
+lemma "evens2": "\<exists> (n::nat) . 2*n > (k::nat)"
+  using evens by auto
+
+lemma "evens3": "\<exists> (n::nat) . 2*n > (k::nat)"
+proof -
+  have example:"2*(k+1) > k" 
+    by simp
+  show ?thesis 
+    using example by blast
+qed
+}
+
+end 
+

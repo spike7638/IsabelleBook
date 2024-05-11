@@ -1,0 +1,62 @@
+% Defines a new command to ignore text — an alternative to 
+% commenting out text
+\newcommand{\ignore}[1]{}
+\RequirePackage[svgnames]{xcolor}
+\usepackage{mdframed}
+\usepackage{ifthen}
+\usepackage{marginnote}
+\usepackage{longtable}
+\usepackage{graphicx}
+\usepackage{sys-listings}
+\usepackage{isabelle-listings}
+\usepackage{geometry}
+\usepackage{bussproofs}
+
+%% Adjust page structure so marginnotes work
+\geometry{
+ left=10mm,
+ textwidth=130mm,
+ marginparwidth=70mm
+ }
+
+%% Set up "Digression" boxes
+\mdfsetup{skipabove=\topskip,skipbelow=\topskip}
+\global\mdfdefinestyle{digression}{%
+frametitle=Digression,%
+linecolor=DarkGreen,linewidth=1pt,%
+leftmargin=0cm,rightmargin=0cm%
+}
+
+\newcommand{\digression}[2][]{
+\ifthenelse { \equal {#1} {} }  %if topic not specified
+    {\begin{mdframed}[style=digression]
+    \parbox{\textwidth}{#2}
+    \end{mdframed}}
+    {
+    {\begin{mdframed}[style=digression, frametitle={Digression: #1}]
+\parbox{\textwidth}{#2}
+\end{mdframed}}}}
+
+%% Misc structural commands
+\newcommand{\term}[1]{\textbf{#1}}
+\newcommand{\todo}[1]{\framebox{\color{red}#1}}
+
+%% Code appearance
+% Define how "system" stuff looks. 
+
+% Defines a new command to write inline generic code. Saying
+% \code{sample text} writes "sample code" in a monospaced font
+% WITH a grey background
+\newcommand{\sys}[1]{\colorbox{blue!05}{\lstinline[language={Sys}]{#1}}}
+\newcommand{\co}[1]{\colorbox{orange!10}{\lstinline[language={Sys}]{#1}}}
+% Inline Isabelle code
+\definecolor{light-gray}{gray}{0.9}
+%\newcommand{\isi}[1]{\colorbox{light-gray}{\lstinline[language={Isabelle}]{#1}}}
+\NewDocumentCommand{\isi}{v}{\colorbox{light-gray}{\lstinline[language={Isabelle}]|#1|}}
+
+\lstnewenvironment{IS} {\lstset{language=Isabelle}\leavevmode}{}
+
+
+
+
+

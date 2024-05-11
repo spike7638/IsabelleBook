@@ -1,0 +1,103 @@
+
+\chapter{Outline of things still to do, and in what order}
+Face up to the fact that it's time to introduce inner and outer syntax and HOL
+Read section 2.7 of https://bookdown.org/aleksander_mendoza_drosik/learn-isabelle/fundamentals-of-isabelle.html#query-proofs
+
+How do we use auto and simp? See https://github.com/isabelle-prover/cookbook/blob/master/src/proofs/methods/Chained_Facts.thy
+
+Nested case proofs (e.g., triangle inequality, where we have a <>0, b <>0. Can I "case" on two things? 
+
+What all the colors mean. "Let", pattern matching, and "unknowns". 
+
+and some apply-scripts
+
+
+Parametrized types; types with constructors; Ballarin/locales for representing mathematical structures. The possibility of contradiction when you make "rules". The challenges of dependent structures.
+
+Teege: bottom of page 45 to top of page 46: difference in what exports from pattern variables or non-pattern variables.
+
+
+
+Chapter 3: The tailor. Sets vs types, UNIV, total functions, "undefined"
+Writing "backwards" proofs
+
+lemma "2 * (n :: nat) + 1 ≥ n + 1"
+proof -
+  presume "2 * n ≥ n"
+   thus ?thesis
+     by simp
+next
+   show "n ≤ 2 * n"
+     by simp
+qed
+end
+
+
+
+Inner vs outer syntax
+Why, when I'm proving things, does "try" (or is it try0?) say that there's a counterexample, but it goes away after I add some definitions to the "using".
+The "lego" model of 
+
+Chapter 1 edits:
+Clean up spivak proofs and lemmas
+Tips on "fixes": "fixes n k" is OK. 
+Fixes n::nat k ,- not OK
+Fixes n::nat and k ← OK
+Fixes f::nat => nat <- needs quotes? 
+Fixes f:: "nat => nat" <- OK
+General: things you're naming can often skip quotes if they're simple, but if you get odd errors, try adding quotes. Example: theorem-names CAN be quoted if you like. Custom says that they almost never are, though. 
+
+What about when you type
+lemma "junk":
+  fixes f::"nat ⇒ nat"
+
+…you get a warning: Outer syntax error⌂: proposition expected,
+but keyword fixes⌂ was found
+ The problem isn't that you typed "fixes", it's that you hadn't finished, and need to type "shows" to make a complete theorem-statement. 
+
+THINGS FOR ME TO LEARN
+
+How to improve the Spivak proofs, step by step. 
+The just-proved fact is always available, so you can stop with "using n-1"
+Sequential arithmetic proofs
+Multiple steps in one 'have'
+
+
+What is available to the various solvers when they do their magic? Auto sometimes fails because I haven't mentioned the definition of lt or ge, etc., but sledgehammer seems to find those things on its own. 
+
+Proving a ton of tiny theorems seems like a Good Thing, but doesn't it make for a combinatorial explosion in the search process?  
+
+Chapter 4: What happens when you define something, or prove a theorem? A whole bunch of new names enter the namespace!
+
+Chapter 3: What various solvers can do well
+Chapter 5: Types, sets, and defining functions on sets
+
+Colors (taken from a stackexchange posting by "Mathieu" at https://stackoverflow.com/questions/22635300/what-do-colour-codes-mean-in-isabelle-jedit):
+
+Logic:
+blue : free variable
+green : bound variable
+orange : skolem constant ("free" variables existentially "quantified")
+cyan : syntax (not a variable or a constant, like case or if)
+Isar Keywords:
+sky blue : commands (like lemma, proof or have)
+red : tactic-style commands (like apply, done or prefer)
+turquoise : statements (like where, fixes, shows or and)
+Messages highlighting in output:
+red : error
+yellow : warning
+light blue : info
+Highlighting in editor:
+red : error
+light yellow : current line
+gray : quoted text (logic and types)
+light gray : comment and formal text (introduced with text or section)
+purple : running process on the command (also shown on the right)
+pink : unprocessed (outdated) command (also shown on the right)
+In general, an underlined command displays a message in the output (possibly associated with an icon and a box on the right). More specifically:
+Icons, [boxes] and {in text}:
+red exclamation mark [red box] {squiggly red underline} : error
+orange exclamation mark [orange box] {squiggly orange underline} : warning
+blue i {squiggly blue underline}: information (often provided by automatic tools)
+{squiggly gray underline} : the command shows a message in the output
+{red text} : comment (like (* This is a comment *))

@@ -1,0 +1,58 @@
+\chapter* {Preface}
+
+I'm assuming you're reading this because you want to try using a proof assistant (PA) and like me, you're someone who already knows how to write proofs of interesting things. My own interests are geometry and topology, just to set some context. I ``learned logic" in 10th grade when we studied Euclidean Geometry. Since those days, I've drifted off and become a computer scientist, and nowadays proof-assistants are used to show many things about computer programs (e.g., ``This program terminates on any input" or ``the state of this filesystem after a `save' operation is what you expect it to be" or ``if you reverse a list twice, you end up with the list you started with."), but those kinds of proofs hold almost no interest for me.
+
+They are (especially the last one) the starting point for most presentations about proof-assistants. The proofs are usually inductive, and many PAs have really great tools for doing inductive proofs. So the introductory presentations harp on and on about induction, and I just can't get much out of them. I've written several papers in math journals, and none of them use induction, and I assume this is true for a lot of mathematicians. 
+
+Other introductory texts on PAs concentrate on \textit{logic}. I know about things like ``modus ponens'' and truth tables and showing that $p \implies q$ is the same as $\neg q \implies \neg p$. But again like many mathematicians, I don't know much about the modern study of logic. I don't lose sleep over the axiom of choice, or constructivism. I mostly just want to get on with proving things about manifolds. But these logic-motivated books tend to start with 30 pages of examples that appear in logic texts, like the theorem that $p \implies  (p \implies p)$ and show how to prove them, and my eyes glaze over once again. 
+
+My goal in writing these notes is to help others like me who want to use a proof assistant, and I'm writing about Isabelle because it seems like the one most likely to be useful to me. 
+
+Of course, some understanding of some logic is necessary to make progress with Isabelle, so I'll have to discuss it at some point. 
+
+I'll introduce what I know of Isabelle through proofs of really silly little theorems, so that the main problems I'm addressing are 
+
+\begin{itemize}
+\item Translation from mathematical writing to Isabelle
+
+\item  Learning a useful subset of the syntax and semantics of Isabelle, possibly oversimplified, but enough to get you started down the road. 
+\end{itemize}
+
+My experience is that Isabelle is hard to learn, partly because various words are used in ways I find peculiar and hard to remember. I started playing with it six years ago and still find myself asking very basic questions. I feel a bit like Lenny in Steinbeck's \emph{Of Mice and Men,} constantly saying to his brother ``Tell me about the rabbits, George." The only thing I've really learned about learning Isabelle is the importance of learning by doing. 
+
+Much of the Isabelle code here is in the form of images in the document. That's partly so that you get to see the formatting that Isabelle provides, which is great. But it's mostly so that in trying it out, you will actually type it all in for yourself, learning patterns of the language by using them. If you don't want to do that, then this isn't the book for you. If you're willing to trust me on this, read on. Indeed, while I'll move to `copyable text' at some point in the presentation, if at some stage you feel as if you're not `getting it,' consider typing stuff in for yourself. It builds something like muscle memory (you start to remember that \isi{unfolding} is a keyword!) and it makes you think (``Why \isi{unfolding}  rather than \isi{using}? I don't really understand the difference!") and possibly fix some gaps in your knowledge. 
+
+We'll start with a tour of Isabelle with a little description of what's going on, but if you find yourself asking ``How would I possibly know what to type at this point?", the answer is ``You wouldn't!" But I believe that seeing the bigger picture may help you understand how the tool gets used, so we're taking the tour. 
+
+\subsection{What using Isabelle looks like}
+
+The general idea in Isabelle is that at any moment, there's something you want to show is true (a goal), and to do so, you can take several possible approaches: 
+
+\begin{itemize}
+    \item 
+You can marshal a bunch of related facts and then combine them, as in ``We've shown that if $x$ is positive, then $f(x)$ is larger than $100$; we've shown that in fact $x$ is at least $2$. Thus $f(x)$ is larger than $100.$" 
+\item
+You can build up one fact after another, each getting closer and closer to the target statement, as in ``Suppose that $\sqrt(2)$ equals a rational number $p/q$, written in lowest terms. Squaring both sides we get $2q^2 = p^2.$ From this we see that $p^2$ is even. By a prior lemma, that in turn tells us that $p$ is even. We can write $p = 2k$ where $k$ is an integer. Then by substitution, we get $2q^2 = (2k)^2$, \ldots", the 'eventual target' in this case being that our supposition must be false. 
+\item
+You can start with the left-hand-side of some alleged equality and do lots of steps of algebra to eventually convert it to some desired right-hand-side. (Although many mathematicians are quite good at this, it's not actually a place where Isabelle particularly shines.) 
+\item 
+You can start with some complex entity and repeatedly simplify it until you get what you want. Think of proofs of trig identities, where one constantly ends up factoring out $sin^2(t) + cos^2(t)$  -- where $t$ could be anything --  and then replacing that combination with the number $1,$ yielding a simpler expression, etc., etc.
+\end{itemize}
+The facts Isabelle has on hand, the various tools developed to manipulate those, and the syntax of Isabelle proofs itself are the tools we (the user and Isabelle) have to work with to address the goals of our work, the usual goal being ``the theorem we're trying to prove happens to be true". 
+
+Isabelle documents used to be written using \term{apply scripts}, which feel like the assembly language of logic. More recently, they're mostly written with Isar, which is a higher-level way to express things. It's still a long distance from natural language, and Isar proofs are sometimes peppered with fragments that look a lot like apply scripts (just as the C programming language once had an ``asm" keyword that introduced fragments of assembly language in the midst of your C code!). But part of my goal in writing these notes is to start with Isar, bringing in the lower-level details only when necessary. 
+
+You'll be forgiven for thinking initially that as a `proof assistant,' Isabelle is a failure -- it seems to be more of a proof \textbf{obstructor} than a proof assistant! You may find yourself in a situation where Isabelle says that some thing is a known fact, and that it's also the goal to be proved. ``Why?", you'll scream, ``Why are you not saying we're done in that case? What more do you want?!?" That's not a situation that helps you advance your mathematical work.  
+
+On the other hand, because of some deep theorem in logic, you can have a lot of confidence that once Isabelle says a proof is correct, it really \textit{is} correct: there's no circular reasoning or logical flaws like proving the converse rather than the contrapositive. So once you become facile with Isabelle, it really does have some value. 
+
+Does it help you do math? My own limited experience says, ``No, not yet." If you're not yet very confident about proving things correctly, or you have really messy things with a ton of cases and want to be sure you didn't miss one, it's probably got some value in 'doing math.' Sometimes writing a theorem in a way that's easy to work with in Isabelle can be an enlightening experience as well, so there's that. 
+
+That brings up another point. There's an old joke about a guy who needs a suit to attend his brother's wedding. The tailor says he'll have the suit ready Friday afternoon, which is good, because the wedding is Friday night. The guy goes to pick up the suit on Friday afternoon and one leg is longer than the other. The tailor says, ``There's no time to fix it, but if you walk with your right foot on tiptoe and your left one flat, it looks fine." Then the guy tries on the jacket, but it's too tight across the back. ``No problem," says the tailor. ``Just throw your arms back and stick out your chest." Then the guy notices that the two sides of the collar are uneven. The tailor tells him to just lean to the right enough that it looks symmetric around his neck. So the guy leaves the tailor shop, arms thrown back and chest pushed out, head tilted over to one side, and hobbling along in a kind of bouncy irregular walk. Two women on the other side of the street notice him, and one says, ``Oh, dear. Look at that poor deformed man. What a hideous life he must lead!" and the other says ``Absolutely, but at least he has a genius for a tailor!" 
+
+Sometimes Isabelle feels that way to me: you take some nice mathematics, and to formalize it you have to twist it almost beyond recognition. At that point, the proofs become easier, but the mathematical ideas are almost unrecognizable. You'll find me mentioning the tailor more than once in these notes.
+
+To be honest, though, a lot of the time using Isabelle feels a bit like a computer game, and you can find yourself up late and night saying ``Wait! I'll just prove \textit{one more} little lemma before I go to bed!" It's pretty addictive, and I think that's a good thing, and it's why I pushed myself to learn more of it.  
+
+\subsubsection{Credit}
+Even in its current infantile form, this set of notes make sense in part because of the help I've received from a bunch of folks --- there are whole sections that are nearly verbatim from emails they've sent, or answers they've given on Zulip Chat, etc. First among these is Manuel Eberl, who has been willing to guide me through forests of ignorance. Gunnar Teege's own notes on Isabelle (and email exchanges) have been very valuable. Dan Dougherty and Tim Nelson have both helped me realize how little I know about logic and improved that situation immensely -- Dan seems to have a talent for knowing the language that I'll understand when he's explaining things, and if you look up ``patience" in the dictionary, you'll find Tim's picture. Eugene Stark marked up a few hundred lines of Isabelle that I wrote in about 2018 -- documents so horrible that they must have made his eyes bleed -- and either made notes on or rewrote large sections, helping me learn some of the idioms and approaches that I now rely on. Mathias Fleury's numerous and helpful comments in Zulip chat have also had a substantial influence on the form and content of these notes. 
