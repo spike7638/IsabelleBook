@@ -11,7 +11,8 @@
 \usepackage{isabelle-listings}
 \usepackage{geometry}
 \usepackage{bussproofs}
-
+\usepackage{amsmath, amssymb}
+\usepackage{float}
 %% Adjust page structure so marginnotes work
 \geometry{
  left=10mm,
@@ -36,6 +37,9 @@ leftmargin=0cm,rightmargin=0cm%
     {\begin{mdframed}[style=digression, frametitle={Digression: #1}]
 \parbox{\textwidth}{#2}
 \end{mdframed}}}}
+
+\newcommand{\task}{{\textbf{Task: }}}
+\newcommand{\etask}{{\textbf{$\blacksquare$ }}}
 
 %% Misc structural commands
 \newcommand{\term}[1]{\textbf{#1}}

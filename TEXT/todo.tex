@@ -1,15 +1,18 @@
 \chapter*{To Do}
 \begin{itemize}
-\item using sliedgehammer: put after "using" or "unfolding" or "have ..." or "show ..." but NOT after "by"
-
-\item Restructure into chapters
+\item using sledgehammer: put after "using" or "unfolding" or "have ..." or "show ..." but NOT after "by"
+\item explain coding: grey background = isabelle code; purple background = isabelle interface components (buttons, files, panels) or interface-responses (the contents of the 'output' panel, for example), except in the rare cases where these are actual isabelle code; peach background = systems things, like filenames typed into dialog boxes. Because such filenames can also be part of isabelle code, I won't be completely consistent about this, but I'll try to at least be sensible.
+\item .Fix spacing in isabelle code style.
 \item Move style files to subdirectory
 \item Make all latex intermediate files be ignored by git
-\item define displayed-code macro: Perhaps IC for displayed code? 
-\item Figure out image inclusion
 \item add section on cartouches
-
+\item Fix marginnote to be able to contain "isi" stuff.
 \item +For the "sys" and "co" languages, make sure that all characters are un=special (e.g., tildes!)
+\item Introduce "Of" and "where" in "using" clauses
+\item Why is code "verbatim-like" and can this be fixed? 
+\item .Restructure into chapters
+\item .define displayed-code macro: Perhaps IC for displayed code? 
+\item .Figure out image inclusion
 \item .get bibliography working
 \item .get non-keyword text in Isabelle source to be ttfamily as well (e.g. presburger)
 \item .Define digression-box (add "digression" header)
@@ -18,6 +21,8 @@
 \item .Reduce left margin; increase right margin so marginpars can fit.
 \item .get Sys language definition working: fixed wdth font, pale blue background
 \end{itemize}
+
+Pointer to isabelle community cookbook: https://isabelle.systems/cookbook
 
 Example citation: \cite{latex2e}.
 
@@ -67,11 +72,20 @@ Example of Inline Isabelle code \isi{theory IbookCh0} and general Isabelle code:
 }
 \lstset{language=Isabelle}
 \begin{lstlisting}
-
 theory IbookCh0
   imports Main EX
 begin
+end
 \end{lstlisting}
+
+\lstset{language=sys}
+\begin{lstlisting}
+theory IbookCh0
+  imports Main EX
+begin
+end
+\end{lstlisting}
+
 \ignore{
 lemma "evens": "\<exists> (n::nat) . 2*n > (k::nat)"
   by presburger
@@ -87,6 +101,4 @@ proof -
     using example by blast
 qed
 }
-
-end 
 
