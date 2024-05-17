@@ -23,7 +23,11 @@ fun A2find_parallel::"a2ln \<Rightarrow> a2pt \<Rightarrow> a2ln" where
 "A2find_parallel  (A2Horizontal C) (A2Point x1 y1) = A2Horizontal (-y1)" | 
 "A2find_parallel (A2Ordinary B C) (A2Point x1 y1) = A2Ordinary B (-x1 - B * y1)" 
 
-theorem  A2a1a: 
+lemma hMeets:
+  shows "A2meets (A2Point x y) (A2Horizontal C) \<Longrightarrow> C = -y"
+  by simp
+
+theorem  A2a1a:
   fixes P Q
   assumes "P \<noteq> Q" and "P \<in> A2Points" and "Q \<in> A2Points"
   shows  "A2join P Q \<in> A2Lines \<and> A2meets P (A2join P Q)  \<and> A2meets Q (A2join P Q)"
@@ -188,14 +192,68 @@ proof -
 next
   show "A2find_parallel l P = l \<or>
     (\<nexists>Pa. Pa \<in> A2Points \<and> A2meets Pa (A2find_parallel l P) \<and> A2meets Pa l)" 
-  proof (cases l)
-    case (A2Ordinary B C)
-    then show ?thesis sorry
+  proof (cases "A2find_parallel l P =l")
+    case True
+    then show ?thesis by auto
   next
-    case (A2Horizontal C)
-    then show ?thesis sorry
+    case False
+    have np: "A2find_parallel l P \<noteq> l" using False by auto
+    presume p: "(\<nexists>Pa. Pa \<in> A2Points \<and>  
+          A2meets Pa (A2find_parallel l P) \<and>
+          A2meets Pa l)"
+    then show ?thesis using False by auto
+    show u:"\<nexists>Pa. Pa \<in> A2Points \<and>
+         A2meets Pa
+          (A2find_parallel l P) \<and>
+         A2meets Pa l" 
+    proof (rule ccontr)  (* np: find_parallel l P \<noteq> l; need to show there's no point Pa on both l and find_parallel l p *)
+                     (* P = (x1, x2) by pFact *)
+      assume h:"\<not> (\<nexists>Pa. Pa \<in> A2Points \<and> A2meets Pa (A2find_parallel l P) \<and> A2meets Pa l)"
+      have h2: "\<exists> Pa . Pa \<in> A2Points \<and> A2meets Pa (A2find_parallel l P) \<and> A2meets Pa l" using h by blast
+      obtain x2 y2 where  paf: "Pa  = A2Point x2 y2"
+          using h p by blast
+      have r: "A2meets Pa l" using h2 p by blast
+      show False
+      proof (cases l)
+        case (A2Ordinary B C)
+        have 3: "A2find_parallel l P =  A2Ordinary B (-x2 - B * y2)" 
+          using h p by blast
+        have pal: "A2meets Pa l" using h2 paf
+          using p by blast 
+        have 1: "x2 + B* y2 + C = 0" using pal using h p by blast
+        have 2: "C = -x2 - B * y2" using 1 by (simp add:algebra_simps)
+        have "l = A2Ordinary B ( -x2 - B * y2)" using 2 A2Ordinary by auto
+        have 4: "l = A2find_parallel l P" using 3
+          using "2" A2Ordinary by auto
+        have False using np 4 by auto
+        thus ?thesis by auto
+      next
+        case (A2Horizontal C)
+        have yf1: "C = -y2" using hMeets paf r A2Horizontal by blast
+        have yf2: "C = -y1" using hMeets using h p by blast
+        have "y1 = y2" using yf1 yf2 by auto
+        have zf: "A2find_parallel l P =l" using A2Horizontal
+          using h p by blast
+        have False using zf np by auto
+        then show ?thesis by auto
+      qed
+    qed
+    show v:"A2find_parallel l P \<noteq> l \<Longrightarrow>
+    \<nexists>Pa. Pa \<in> A2Points \<and>
+         A2meets Pa
+          (A2find_parallel l P) \<and>
+         A2meets Pa l"
+      using u by blast 
+  next
+    show "A2find_parallel l P \<noteq> l \<Longrightarrow>
+    \<nexists>Pa. Pa \<in> A2Points \<and>
+         A2meets Pa
+          (A2find_parallel l P) \<and>
+         A2meets Pa l"
+      by (smt (verit) A2find_parallel.simps(1) A2find_parallel.simps(2) A2meets.simps(1) A2meets.simps(2) a2ln.exhaust a2pt.exhaust) 
   qed
 qed
+
 
 theorem  A2a2c1:
   assumes "P \<in> A2Points" and "l \<in> A2Lines"
