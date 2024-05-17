@@ -1,23 +1,35 @@
-\chapter{More mechanical details and how-tos, and a bit more syntax.}
+\chapter{More mechanical details, and a bit more syntax.}
+\section{Introduction}
 After the brief introduction of the last chapter, you probably have a bunch of questions, things like 
+\begin{itemize}
+\item    
 The math-y stuff in double quotes --- what am I allowed to write in there? Can I use things like "using" and "show"? 
+\item    
 When do I need double-quotes? 
-This whole "using" thing seems annoying. Why doesn't Isabelle just keep track of the things I've proved and assume that I want to use those whenever possible? 
-We used the name "example" (and later the shorter "ex") for the various facts we accumulated, but what are the rules for those? From trying out 'instance' I could see that using an Isabelle keyword was bad, but is everything else OK? 
+\item    
+This whole ``using'' thing seems annoying. Why doesn't Isabelle just keep track of the things I've proved and assume that I want to use those whenever possible? 
+\item    
+We used the name ``example'' (and later the shorter "ex") for the various facts we accumulated, but what are the rules for those? From trying out `instance' I could see that using an Isabelle keyword was bad, but is everything else OK? 
+\item    
 How do I type the characters that I need? I can't just wait for you to tell me all of them!
-You had me use "Output" and "State" in two of the panels, but what are those other things? 
+\item    
+You had me use \sys{Output} and \sys{State} in two of the panels, but what are those other things? 
+\item    
 Do I have to put everything in one theory file?
-In all those proofs, you built up stuff to prove the main "thesis", but what about proofs where we work backwards from the thesis, like saying "to prove that for positive numbers n,  2n + 1 > n + 1", it suffices to prove  that 2n > n"? Can we do those in Isabelle? 
+\item    
+In all those proofs, you built up stuff to prove the main ``thesis'', but what about proofs where we work backwards from the thesis, like saying ``to prove that for positive numbers n,  2n + 1 > n + 1, it suffices to prove  that 2n > n''? Can we do those in Isabelle? 
+\item    
 Building up proofs in individual steps seems OK, but if a theory file gets big, how will I remember the names of all the things that I can use in trying to write a proof -- is it \isi{plus_commute} or \isi{add_commute}? Can Isabelle help with some of this?
+\end{itemize}
 
 We'll answer some of those in this chapter, and partially answer others. In making this list, I wanted to reassure you that if you feel confused about something, it's perfectly reasonable: Isabelle has a lot of parts, and it's impossible to introduce them all at once, so there'll be pending questions for a while.
 
-Disclaimer
+\subsection*{Disclaimer}
 By the way, Isabelle is a system in which something called Higher Order Logic (HOL) is implemented, resulting in Isabelle/HOL, which is what I've been calling "Isabelle". There are other logics implemented in Isabelle as well, such as First Order Logic, and Zermelo-Frankel Set Theory; these result in Isabelle/FOL and Isabelle/Zf, about which I will say no more because I know nothing about them. Furthermore, the interface we'll use is called Isabelle/jEdit, and it's a complex program in itself. But I'm going to be sloppy and use the word Isabelle for this editor, for the Isabelle/HOL language, and for the whole ecosystem. 
 
 You can write a program that links to Isabelle, or even write code within an Isabelle theory document, or ask Isabelle to produce code that implements something that you've proved (in Isabelle) to be correct. I know nothing more about these topics than that they exist, so you won't learn about them in this book. 
 
-Warmup: more mechanics
+\section{Warmup: more mechanics}
 Looking at the bottom of the center column of the interface, we see this:
 
 
@@ -32,7 +44,9 @@ where I've clicked on the choice "Arrow", which shows all the kinds of arrows av
 
 and this shows you that to produce that character in your theory file, you may type \isi{\\<Longrightarrow>} (although \isi{\\Longrightarrow} also works), or type ".>" (which doesn't work on my system), or type "==>", which does work. This lets you rapidly assemble a collection of shortcuts for symbols that you use often, and lets you look up others. If you use LaTeX, many of the symbol-names closely match the ones in LaTeX. The most useful of the options in this particular section is probably the one called "Search". Confession: I used this panel to find some favorite symbols, and now seldom look at it at all. 
 
-In practice, I use only a few of the symbols, and below I show my go-to list. You've already seen greater-than-or-equal, and can guess at similar things, I'm hoping. And Greek letters are just given by their names with backslash in front, like \beta.
+In practice, I use only a few of the symbols, and below I show my go-to list. You've already seen greater-than-or-equal, and can guess at similar things, I'm hoping. And Greek letters are just given by their names with backslash in front, like \isi{\beta}.
+
+\begin{verbatim}
 
   [|    ⟦
   |]    ⟧
@@ -54,6 +68,7 @@ In practice, I use only a few of the symbols, and below I show my go-to list. Yo
   \inter ∩
   \emptyset ∅
   \subset ⊂
+\end{verbatim}
 
 Query
 The query tab gives you the ability to find already-proved theorems to use, saving you a ton of work. The only tricky thing about it is the need to press the "Apply" button. So many other things in Isabelle's interface happen 'as you type' that it's easy to forget. Within the Query panel are several choices:
@@ -185,73 +200,99 @@ Then we can re-run the "build" command and get a document.pdf that starts like t
 
 Warning: If your theory file contains an error, it's possible that your "build" will fail, and then you need to fix things. If your document contains clever LaTeX tricks, debugging the build process can become a serious challenge, alas. I have no suggestions except that in trade for the beauty of the output, you have to eventually get comfortable with the challenges of the complicated LaTeX typesetting system.
 
-That was a lot of mechanics, but we've mostly addressed items 5, 6, and 7 from the pending-questions list. Let's move on to some more questions about actually proving things. 
-More proving: a different style
-Isabelle (and in particular Isar) provides another way of stating theorems, one that has a lot of appeal because of its consistency. For our little 'evens' theorem, it looks like this:
+That was a lot of mechanics, but we've mostly addressed items 5, 6, and 7 from the pending-questions list. 
 
+\subsection{Encouragement}
+In these first two chapters, I've introduced you, very slowly and carefully, to the mechanical parts of Isabelle that took me a while to learn, or surprised me, or were tricky (like getting the whole LaTeX thing set up). There will be more as we go along, but I encourage you to poke around in the interface for yourself and discover new things. For some, you'll probably ask ``Why would I even need \textit{that}?''; for others, you'll say ``Finally! That's just what I was hoping to find!'' 
+
+There's one tip I can give here: the menus associated with the Isabelle interface (which is written atop something called \co{jEdit}) are almost all about \co{jEdit}, and therefore mostly uninteresting to beginning users. The thing that \textit{is} interesting and Isabelle-specific is in the \co{Plugins...Isabelle} menu, although I doubt you'll find much use for it until you're working on much more complex projects.
+
+
+\section{More proving: a different style}
+
+Let's move on to some more questions about actually proving things. 
+Isabelle (and in particular Isar) provides another way of stating theorems, one that has a lot of appeal because of its consistency. For our little \isi{evens} theorem, it looks like this:
+\begin{IS}    
 lemma evens5:
   fixes k::nat
   shows "∃ n . 2*n > k"
 proof -
   show ?thesis by presburger
 qed
+\end{IS}
 
-I've used the simple presburger proof here so that I can concentrate on the statement. For more complicated theorems, there can also be an "assumes" between "fixes" and "shows". But in this simple case, the name k, which was previously universally quantified without our saying anything about it, is made explicit up front. This is meant to remind you of the way you might start when you want to show that "for any k, there's an even number bigger than k." You start by saying "Let's fix some arbitrary natural number k, and then …" 
+I've used the simple presburger proof here so that I can concentrate on the statement. For more complicated theorems, there can also be an \isi{assumes} between \isi{fixes} and \isi{shows}. But in this simple case, the name \isi{k}, which was previously universally quantified without our saying anything about it, is made explicit up front. This is meant to remind you of the way you might start when you want to show that ``for any $k$, there's an even number bigger than $k$.'' You start by saying ``Let's fix some arbitrary natural number $k$, and then …'' 
 
-Digression on getting theorem statements right
-Let's suppose you want to show that for positive n, we have 2n + 1 > n + 1, and you write
+\subsection*{Digression on getting theorem statements right}
+Let's suppose you want to show that for positive $n$, we have $2n + 1 > n + 1$, and you write
 
+\begin{IS}
 lemma "dominate": " 2* (n::nat) + 1 > n + 1"
-  by presburger
+  by presburger    
+\end{IS}
+\noindent
+filling in the \isi{by presburger} based on your experience with showing this sort of thing.  Go ahead and type this in, and see what happens. 
 
-filling in the "by presburger" based on your experience with showing this sort of thing. 
-Go ahead and type this in, and see what happens. 
+You'll notice two things: the proof has a red circle to its left, with  \isi{presburger} underlined with a red squiggle, and the theorem itself has a blue `i' next to it. If you place your cursor on the lemma statement, you'll see in the output window 
 
-You'll notice two things: the proof has a red circle to its left, with  'presburger' underlined with a red squiggle, and the theorem itself has a blue "i" next to it. If you place your cursor on the lemma statement, you'll see in the output window 
+That's telling you that a background process has been checking the theorems you're claiming, just to see whether it can find an easy counterexample. In this case, it came up with $n = 0$, which is indeed a natural number for which the alleged theorem's not true. This can be a big help in getting theorem statements right. <End of digression>
 
-That's telling you that a background process has been checking the theorems you're claiming, just to see whether it can find an easy counterexample. In this case, it came up with n = 0, which is indeed a natural number for which the alleged theorem's not true. This can be a big help in getting theorem statements right. <End of digression>
+We can restate that ``dominate'' lemma in fix-assume-show form:
 
-We can restate that "dominate" lemma in fix-assume-show form:
+My experience is that this structure helps me remember to assign types to things (in the \isi{fixes} line), and to write down all hypotheses (in the \isi{assumes} line). I've omitted writing a proof because I want to use this example later to show a different style of proving from the ones we've seen so far. 
 
-My experience is that this structure helps me remember to assign types to things (in the "fixes" line), and to write down all hypotheses (in the "assumes" line). I've omitted writing a proof because I want to use this example later to show a different style of proving from the ones we've seen so far. 
+There's a corresponding proof structure to the theorem-stating \isi{fixes-assumes-shows} pattern. It uses the imperative form of the three verbs: \isi{fix, assume, show}. We'll return to this in Chapter XXX.
 
-There's a corresponding proof structure to the theorem-stating fixes-assumes-shows pattern. It uses the imperative form of the three verbs: fix, assume, show. We'll return to this in Chapter XXX.
-
-Each of the three parts of a fixes-assumes-shows theorem-statement can also contain "and", or can be repeated, so "fixes n and k" is acceptable, but so is 
+Each of the three parts of a \isi{fixes-assumes-shows} theorem-statement can also contain \isi{and}, or can be repeated, so \isi{fixes n and k} is acceptable, but so is 
+\begin{IS}
   fixes n 
-  fixes k
-Here's a very silly example making two claims about some natural numbers, showing how "and" is used. 
+  fixes k    
+\end{IS}
+
+Here's a very silly example making two claims about some natural numbers, showing how 
+\isi{and} is used. 
 
 
 
 Two notes are due here.
+
 Generally showing two or more things isn't a great idea. When you later refer to the theorem, Isabelle has to guess which conclusion you think is relevant in the current situation. Of course, if there's some complicated set of hypotheses that you don't want to repeat multiple times, and that leads to several facts (e.g., a theorem of the form "If we know A, B, and C, then the following 5 statements are all equivalent"), it's OK to write such a theorem. But don't do it unless you need to. (To be fair, I'll be violating this first suggestion in a page or two!)
-If in my silly lemma I had replaced the second conclusion with "n * k > 15", I'd have been stuck -- nothing we've learned about yet shows how to prove such an inequality. I'm deliberately concentrating for now on the structures of proofs rather than the use of existing theorems to prove new ones. 
 
-Practice
-You're now going to practice writing theorems using the fix/assume/show format, and then proving them using the few tools you've learned so far. To supply a meaningful example, I've taken part of the first chapter of Michael Spivak's Calculus, which introduces an axiomatic formulation of the real numbers, and encoded it in Isabelle. (The book, at least in early editions, is widely available as a PDF download.) Spivak shows how to use the axioms to prove some small results, and I've imitated some of those proofs (almost verbatim) in Isabelle.
+If in my silly lemma I had replaced the second conclusion with "n * k > 15", I'd have been stuck -- nothing we've learned about yet shows how to prove such an inequality. I'm deliberately concentrating for now on the \textit{structures} of proofs rather than the use of existing theorems to prove new ones. 
 
-Open up the IbookCh1_starter.thy file and take a look at the first few lines, and then continue reading here.
+\section{Practice}
+You're now going to practice writing theorems using the fix/assume/show format, and then proving them using the few tools you've learned so far. Thus the bulk of this Chapter's content is actually in an Isabelle theory file, one that needs to be filled in (by you!). 
+
+To supply a meaningful example, I've taken part of the first chapter of Michael Spivak's Calculus, which introduces an axiomatic formulation of the real numbers, and encoded it in Isabelle. (The book, at least in early editions, is widely available as a PDF download.) Spivak shows how to use the axioms to prove some small results, and I've imitated some of those proofs (almost verbatim) in Isabelle.
+
+\task Find Spivak's book and open up that first chapter so that you know what we're talking about for the remainder of this chapter. 
+\etask
+
+Open up the \co{IbookCh1_starter.thy} file and take a look at the first few lines, and then continue reading here.
 
 One challenge here is that the natural numbers and integers, and their associated notions of addition and multiplication are already present in Main, and I want to be sure that Spivak's discussion isn't polluted by those. To do so, I've declared a new type, named "r" (for "real"), to serve as a proxy for the real numbers. When we declare a new type, we're guaranteed two things: there is at least one value of that type, and any value of our new type is different from any value of any previously-existing type. So it gives us a clean slate to work from. 
 
-Initially we know virtually nothing about the type r, but I've used the "sorry" feature of Isabelle to allow me to make statements about elements of r that will be taken as true henceforth. (Yes, I warned earlier about the perils of "sorry" and how one might accidentally introduce inconsistent 'truths' by using them. But I'm pretty confident that the axioms of the reals are not, in fact, contradictory, so I'm happy to do this for this example.) By the way statements to be taken as true henceforth are called facts. 
+Initially we know virtually nothing about the type r, but I've used the \isi{sorry} feature of Isabelle to allow me to make statements about elements of r that will be taken as true henceforth. Yes, I warned earlier about the perils of \isi{sorry} and how one might accidentally introduce inconsistent 'truths' by using them. But I'm pretty confident that the axioms of the reals are not, in fact, contradictory, so I'm happy to do this for this example. 
+
+By the way, statements to be taken as true henceforth are called \term{facts}. 
 
 There's an alternative Isabelle construct -- axiomatization -- that I could have used for the same purpose, but it's generally reserved for quite specific tasks like defining a new logic, and I don't expect to ever use it in my Isabelle documents, so I wanted to avoid using it here. Let's see how things start out:
 
-I've said here that there's a new type called "r", and that there are six "constants". The first four are functions called plus, minus, neg, and reciprocal; the last two are single elements of r to which I've given the name Z (suggesting 'zero') and U (suggesting 'unit', and which is supposed to act as 'one'  in our number system, but abbreviating with the first letter and getting "O" seemed like a really bad choice for something that was representing "1"). A constant is simply a name that will be used throughout a document to mean a single thing. Their use is relatively rare in Isabelle, but appropriate for an example like this. True and False are constants of type bool, for example. By the way, although we've given the names Z and U to two items of type r, they might actually denote the same item; nothing we've said so far prevents this.
+I've said here that there's a new type called "r", and that there are six "constants". The first four are functions called plus, minus, neg, and reciprocal; the last two are single elements of r to which I've given the name Z (suggesting 'zero') and U (suggesting 'unit', and which is supposed to act as 'one' in our number system, but abbreviating with the first letter and getting "O" seemed like a really bad choice for something that was representing "1"). A constant is simply a name that will be used throughout a document to mean a single thing. True and False are constants of type bool, for example. By the way, although we've given the names Z and U to two items of type r, they might actually denote the same item; nothing we've said so far prevents this.
 
 In a "consts" declaration in Isabelle, the name of each constant is given, followed by a double-colon, and then the type of the constant. This type-description must be in double-quotes unless it's particularly simple (as it is for Z and U). What about those arrows, though? 
 
-Let's start with "neg", which is going to play the role of negation, i.e., producing the additive inverse of a number. Its type is r => r  (you produce the pretty arrow shown above by typing '=>', and in this text document I'll continue to use that). What A => B means is that this thing is a function taking an argument of type A to a result of type B. If you like, A is the domain and B is the codomain. (There's a subtle point here: A is a type, not a set. So there's no way in this format to describe a function from the even integers to the positive reals, for example.) The "neg" function has type r => r, meaning that it takes in an item of type r (which we're thinking of as a real number) and produces an item of type r.
+Let's start with "neg", which is going to play the role of negation, i.e., producing the additive inverse of a number. Its type is r => r  (you produce the pretty arrow shown above by typing '=>', and in this text document I'll continue to use that). What A => B means is that this thing is a function taking an argument of type A to a result of type B. If you like, A is the domain and B is the codomain. (There's a subtle point here: A is a \textit{type}, not a \textit{set}. So there's no way in this format to describe a function from the even integers to the positive reals, for example.) The "neg" function has type r => r, meaning that it takes in an item of type r (which we're thinking of as a real number) and produces an item of type r.
 
-Brief digression: I'm slowly introducing the language of types in Isabelle. There are several that are in Main (like int and nat), but you can create new types (i.e., labels to use for things to be certain that they're treated as different from anything else that is not of that type) using typedecl. You can also describe a new type by writing type1 => type2; that is the name for the type of things that are functions from type1 to type2. (Some people call these 'arrow types'.) So nat => nat is a type that you could assign to some name. Given that you can put an arrow between any two types, you could write int => nat => nat, which Isabelle treats as int => (nat => nat), i.e., if f has this type, then f 3 denotes a nat-to-nat function. Just to clarify: in Isabelle, f 3 denotes what, in mathematics, we'd write as f(3). And that's enough about types for the moment. <end of digression> 
+Brief digression: I'm slowly introducing the language of types in Isabelle. There are several that are in Main (like int and nat), but you can create new types (i.e., labels to use for things to be certain that they're treated as different from anything else that is not of that type) using typedecl. You can also describe a new type by writing type1 => type2, which is the name for the type of things that are functions from type1 to type2. (Some people call these \term{arrow types}.) So nat => nat is a type that you could assign to some name. Given that you can put an arrow between any two types, you could write int => nat => nat, which Isabelle treats as int => (nat => nat), i.e., if f has this type, then f 3 denotes a nat-to-nat function. Just to clarify: in Isabelle, f 3 denotes what, in mathematics, we'd write as f(3). And that's enough about types for the moment. <end of digression> 
 
 As observed in the digression above, in Isabelle, function names are followed by arguments, so while in a mathematics text we might write f(x), in Isabelle we'd write "f x". That takes some getting used to. This means that if we want to think about the additive inverse of the multiplicative identity element, we'll need to write "neg U".
 
 Now let's look at "plus". Most mathematicians would say that "plus" is a function from ℝ × ℝ to ℝ. Let's call that function "p" for the moment, so that p(3, 5) denotes the sum of 3 and 5. We could define a new function, q, by saying that q(x) = p(3, x), right? Then q would be the "add 3" function. And we could define h by h(x) = p(14, x), so that h is the "add 14" function. Clearly we can generalize like mad and define S(a) to be the function sending x to a + x. This process is called "currying", and computer scientists love it. (The term is named for Haskell Curry.) In this example, the domain of S is "reals" and the codomain is "real-to-real functions". If we adopt the notation A => B to denote all functions from A to B, then the function S has the type
-ℝ => (ℝ => ℝ). Computer scientists would write that as ℝ => ℝ => ℝ, saying that "=>" 'associates to the right', so that the parentheses are unnecessary. And that's what our declaration of 'plus' is saying: 
+ℝ => (ℝ => ℝ). Computer scientists would write that as ℝ => ℝ => ℝ, saying that "=>" 'associates to the right', so that the parentheses are unnecessary. \marginnote{In Isabelle, all arrows associate to the right, which is useful to remember. IF you're feeling unsure, you can add parentheses to clarify things, but eventually you'll get tired of adding them and just remember the rule.}
+And that's what our declaration of 'plus' is saying: 
 plus:: r => r => r
+
 
 Thus "plus 3" is the function sending x to 3 + x, and "plus 3 5" applies this function to the number 5, and hence it evaluates to 8. Or at least all that would be true if we defined plus properly, and if 3 and 5 were actually names for things of type r. But anyhow, that's the intuition. So our first few lines say that we have functions that will represent addition, multiplication, additive inverse, and reciprocal. 
 
@@ -267,7 +308,7 @@ Spivak begins by talking about adding pairs of numbers, and then about adding up
 
 In my "fixes" line I've given types to a, b, and c. I could have omitted the types of all three because in the "shows" line they get the ⊕ operation applied to them, so they must be of type r. In general, Isabelle documents omit type annotations like the ones I've provided, but these annotations do no harm, especially if they're used sparingly. For this starter material, I'm trying to be generous with clarifying everything for you. In a week or so, you'll find yourself thinking how stupid that was and how cluttered these early proof documents look. 
 
-Digression on unification: How does Isabelle know that these things have to be of type r? Through an algorithm called "unification". Suppose that the 'fixes" line was 
+Digression on unification: How does Isabelle know that these things have to be of type r? Through an algorithm called \term{unification}. Suppose that the 'fixes" line was 
  
 fixes a and b and c
 
@@ -335,11 +376,13 @@ Informally, that's (very loosely speaking) what's going on as Isabelle tries to 
 Sometimes we can get away with two steps at once. Suppose we wanted to show that (Z ⊕ U) ⊕ U = U ⊕  (Z ⊕ U), The argument might be that in (Z ⊕ U) ⊕ U, we can swap the positions of the first two items to get (U ⊕ Z) ⊕ U, and then use our associativity result to get the conclusion. Perhaps we have a plus_commute lemma. We could then say "using plus_assoc plus_commute by auto" in the proof. But plus_commute can be applied all over the place! In that first expression, 
 (Z ⊕ U) ⊕ U 
 we can use it to transform things to (U ⊕ Z) ⊕ U, or to transform to U ⊕ (Z ⊕ U). If we did the second, then we couldn't apply plus_assoc any more, though. We could also apply plus_assoc first, and then apply plus_commute in various ways to the result. There is, in the words of Jorge Luis Borges, a "garden of forking paths" here, and finding the one that leads from what we know to what we want becomes a kind of search problem: finding a path through the graph whose nodes are knowledge-states and whose edges are "transitions gotten by applying theorems or other facts" to these, a path that goes from our initial state of knowledge to one in which our desired conclusion is a known fact. There are 
-Lots of dead ends in such a search
-Often multiple paths from our initial state to some goal state
+\begin{itemize}
+    \item Lots of dead ends in such a search
+\item Often multiple paths from our initial state to some goal state
+\end{itemize}
 The first of these means that Isabelle's basic reasoning methods, which use a bounded number of steps, can't make very big leaps for us. In much of what we'll do initially, we'll be asking it to follow just one edge or maybe two in this graph. The second one means that if you use a fancy tool like sledgehammer, different solvers may come up with different ways to get to a solution, some of them quite short ("by auto") and others long and complex. 
 
-With all that in mind, I'm now going to ask you to use Isabelle in this 'baby steps' mode, where you take some known fact(s) and slightly transform it by applying a theorem/lemma/definition to get a new fact, gradually reaching your desired conclusion. The "known fact" is often the assumptions of the theorem you're trying to prove, so you'll often write something like 
+With all that in mind, I'm now going to ask you to use Isabelle in this 'baby steps' mode, where you take some known fact(s) and slightly transform it by applying a theorem/lemma/definition to get a new fact, gradually reaching your desired conclusion. The "known fact" is often the assumptions of the theorem you're trying to prove (and Isabelle gives it the name \isi{assms}), so you'll often write something like 
 
    have   1:"a \in P" using assms by auto 
 

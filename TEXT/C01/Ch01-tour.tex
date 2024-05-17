@@ -34,7 +34,7 @@ Right here I want to have you do something important. Near the top right of the
 \sys{Output} panel, you can see this:
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.75\linewidth]{image.png}
+    \includegraphics[width=0.75\linewidth]{TEXT/C01//Images/image.png}
 \end{figure}
 \textit{Be sure that \sys{Proof state} and \sys{Auto update} are both checked.} In everything I write from now on I'll assume that you've done this, so do it now! [Why? Because as you work, you'll constantly be looking at this panel, and having it update as you type, rather than requiring a cursor-motion-and-click, is really nice. Checking \sys{Proof state} says that you'd like to see a little more than the bare minimum feedback, which saves you from looking at \textit{another} panel all the time.]
 
@@ -43,7 +43,7 @@ Moving on, there's the column on the right. \sys{Auto update} is checked, becaus
 In the middle column, the top panel show the currently-active file-name at the top (\co{Untitled-1 (\~/)}; if you look to the right of that filename, you'll see a down-arrow that you can click to discover that there may be other editor buffers available for you to look at as well. When I click on mine, I see this:
 \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{file-list.png}
+    \includegraphics[width=1\linewidth]{TEXT/C01//Images/file-list.png}
 \end{figure}
 which tells me that in addition to the \co{Untitled-1} document, I've also got open \co{Scratch.thy}. By moving my cursor over that and releasing, I can switch to showing that document if I like. Using the \sys{File} menu, you can open a new document (it'll be called \co{Unititled-2}) and toggle between the two of them if you like.
 
@@ -52,12 +52,12 @@ In general, dropdowns like this abound. There's another at the top of the lower 
 It'd be nice to start writing a theorem and proof, but such things must be contained in a \textit{theory file} for Isabelle to process them. So let's save \co{Untitled-1} (type command-S (Mac) or ctrl-S (Windows)) to do so. You'll see a dialog appear. Mine shows that the file will be saved in \co{/Users/jfh}, but I could navigate around to save it somewhere else. It also shows (at the bottom of the dialog box) that the file will be called \co{Untitled-1}:
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.5\linewidth]{file-chooser.png}
+    \includegraphics[width=0.5\linewidth]{TEXT/C01//Images/file-chooser.png}
 \end{figure}
 Let's change that to \co{IBookCh1.thy}, where \co{IBook} means `Isabelle book', \co{Ch1} means `Chapter 1', and \co{.thy} is the extension \textit{required on all theory files}. Without this extension, nothing will work. So let's suck it up and type it in:
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.75\linewidth]{file-name-edit.png}
+    \includegraphics[width=0.75\linewidth]{TEXT/C01//Images/file-name-edit.png}
 \end{figure}
 and click \sys{Save}. 
 
@@ -66,7 +66,7 @@ Two things happen when we save the file: the document title at the top changes t
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.5\linewidth]{interface-update.png}
+    \includegraphics[width=0.5\linewidth]{TEXT/C01//Images/interface-update.png}
 \end{figure}
 Less obvious is the appearance of a purple line down the left side of the document. 
 
@@ -80,7 +80,7 @@ We can now start creating our theory document. There are very strict rules for t
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.5\linewidth]{first-theory.png}
+    \includegraphics[width=0.5\linewidth]{TEXT/C01//Images/first-theory.png}
     \caption{A first theory document}
     \label{fig:first-theory-doc}
 \end{figure}
@@ -89,7 +89,7 @@ The theory \textit{must} start with the word \isi{theory}; the theory's name com
 To the left are two small markers that look like a circle with a `$-$' in it, and then a line with a hook. These represent collapsible parts of the document. If I click on the top circle, the display changes to this:
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.5\linewidth]{folded-theory.png}
+    \includegraphics[width=0.5\linewidth]{TEXT/C01//Images/folded-theory.png}
 \end{figure}
 \noindent which tells you that the first bit of the file has been ``folded up'' and 1 line is now hidden. I can expand it again by clicking on the circled `$+$'. This can be helpful in longer documents for hiding all except the part that you're interested in at some moment. 
 
@@ -108,13 +108,13 @@ imports Main Tigers
 it'd be a problem, though, because there isn't a theory called \isi{Tigers}. Your interface would look like this:
 \begin{figure}[h]
     \centering
-    \includegraphics[width=1\linewidth]{tigers.png}
+    \includegraphics[width=1\linewidth]{TEXT/C01/Images/tigers.png}
 \end{figure}
 \newpage
 And down below, in the Output panel, you'd see this:
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.75\linewidth]{tiger-error.png}
+    \includegraphics[width=0.75\linewidth]{TEXT/C01/Images/tiger-error.png}
 \end{figure}
 
 Or at least you would as long as your cursor was on the \isi{imports} line as shown above. 
@@ -143,7 +143,7 @@ Your typing that first theorem caused some changes to appear in the interface. H
 
 First, the color-coding tells you something. A variable associated with an ``exists'' or ``forall'' is said to be a \term{bound variable}, and they show up in green, as happens with $n$ above. Here's another lemma in which \textit{two} variables are bound by a single ``exists'':
 \begin{figure}[h]
-    \includegraphics[width=0.5\linewidth]{junk-lemma.png}
+    \includegraphics[width=0.5\linewidth]{TEXT/C01/Images/junk-lemma.png}
 \end{figure}
 
 It's a stupid lemma, but it shows the green highlighting. You can go ahead and delete it now. 
@@ -152,7 +152,7 @@ In the \isi{evens} lemma, the variable k is \textit{unbound}, so it's shown in b
 
 Again, while you were typing, another process was interpreting and recoloring. Things now look like this:
 \begin{figure}[h]
-    \includegraphics[width=0.75\linewidth]{unproved-lemma.png}
+    \includegraphics[width=0.75\linewidth]{TEXT/C01/Images/unproved-lemma.png}
 \end{figure}
 \newpage
 (I've trimmed off the top line giving the theory name, and in subsequent images, I'll focus on just the area where we're working.)
@@ -171,13 +171,13 @@ Obviously the first of these is the best choice, but sometimes we get frustrated
 
 \textbf{Task}: For now, though, try the experiment. After the lemma, type \isi{sorry}. That word will get highlighted in pink, but you can move on. In fact, you can type \isi{thm evens}, which is a way of asking Isabelle to tell you what it knows about a theorem called \isi{evens}: 
 \begin{figure}[h]
-    \includegraphics[width=0.75\linewidth]{sorry-result.png}
+    \includegraphics[width=0.75\linewidth]{TEXT/C01//Images/sorry-result.png}
 \end{figure}
 
 And down in the \sys{Output} panel you'll get a result:
 
 \begin{figure}[H]
-    \includegraphics[width=0.5\linewidth]{result.png}
+    \includegraphics[width=0.5\linewidth]{TEXT/C01//Images/result.png}
 \end{figure}
 
 That result looks at least somewhat like our theorem. There's a weird question-mark thing going on, and there's no \isi{\forall k} even though I said Isabelle had one implicitly, and the inequality has been swapped around to use \isi{<} instead of \isi{>}, but it's clearly our theorem there on display. All three of these oddities are things that just happen in Isabelle (for good reasons!), and soon you won't notice them as much as you do at first. 
@@ -197,17 +197,17 @@ Your proof was probably one of these, but there are surely others. If yours was
 
 Let's see one of Isabelle's strong points right here. We're going to ask it to find a proof, and it's going to try a bunch of strategies --- simplification, 'tableau solvers', a reasoner for linear arithmetic, something called a SAT-solver, etc. --- and see what it can come up with. Typing the word \isi{try} makes all this happen. Sadly, especially for new users, \isi{try} sometimes reports that a proof is easy, but doesn't tell you what to type, which is infuriating. Much nicer is \isi{try0}. So right after our lemma, we'll type \isi{try0} (which dispatches a bunch of processes that report back) and wait for a moment:
 \begin{figure}[h]
-    \includegraphics[width=0.5\linewidth]{try0.png}
+    \includegraphics[width=0.5\linewidth]{TEXT/C01//Images/try0.png}
 \end{figure}
 
 A moment later, down in the \isi{Output} panel, we see this:
 \begin{figure}[H]
-    \includegraphics[width=0.75\linewidth]{try0-results.png}
+    \includegraphics[width=0.75\linewidth]{TEXT/C01//Images/try0-results.png}
 \end{figure}
 
 Apparently a proof-method called \isi{presburger} has found a proof. So we can click on the highlighted \isi{by presburger} and it'll be pasted into the buffer. We'll need to backspace out the \isi{try0} to end up with this:
 \begin{figure}[h]
-    \includegraphics[width=0.5\linewidth]{first-proof.png}
+    \includegraphics[width=0.5\linewidth]{TEXT/C01/Images/first-proof.png}
 \end{figure}
 And down in the output window, we have this:
 \begin{figure}[h]
@@ -231,18 +231,18 @@ Now let's try to do another proof of this theorem. 
 \task Copy-and-paste the lemma, and change the name from \isi{evens} to \isi{evens2}. Move your cursor to the next line and wait a moment, and in the \sys{Output} panel, this appears:
 
 \begin{figure}[h]
-    \includegraphics[width=1\linewidth]{auto-proof.png}
+    \includegraphics[width=1\linewidth]{TEXT/C01/Images/auto-proof.png}
 \end{figure}
 
 Isabelle has done a bit of looking ahead and realized this lemma is particularly easy to prove: it's a consequence of the lemma immediately above (which it has called \isi{IBookCh1.evens}, because we gave it the name \isi{evens}, and it's in a document called \co{IBookCh1.thy}). Unfortunately, it has \textit{not} said how to actually write the proof in Isabelle -- the sort of thing that try0 might have helped with. It turns out that the magic incantation is \isi{using evens by auto} (although \isi{simp} and \isi{blast} could be used instead of \isi{auto} --- any one of them is capable of making the leap from the statement of \isi{evens} to the statement of \isi{evens2}!) Go ahead and type this to see that you've got a second complete-and-proved lemma.
 \etask 
 
-\digression[Proof methods]{Isabelle has several built-in proof methods, tools that help us get from what we know to what we want to prove. Names you'll often see are \isi{auto}, \isi{blast}, \isi{simp}, \isi{metis}, \isi{presberger}. Each is good at one thing. The \isi{simp} method, for instance, is good at a particular standardized form of simplification, as the name suggests. For now we're going to aim to use \isi{auto} as often as possible, but when other names pop up in the next chapter, try to just say to yourself ``I suppose he'll explain what that method does at some point."
+\digression[Proof methods]{Isabelle has several built-in proof methods, tools that help us get from what we know to what we want to prove. Names you'll often see are \isi{auto}, \isi{blast}, \isi{simp}, \isi{metis}, \isi{presberger}. Each is good at one thing. The \isi{simp} method, for instance, is good at a particular standardized form of simplification, as the name suggests. For now we're going to aim to use \isi{auto} as often as possible, but when other names pop up in the next chapter, try to just say to yourself ``I suppose he'll explain what that method does at some point.''
 }
 
 Let's try to do one of our \textit{own} proofs of the theorem. Once more, copy-paste the theorem statement and change the name, this time to \isi{evens3}. With your cursor after the theorem, the \sys{Output} panel should now be offering you two ways to trivially prove your theorem, but we're going to ignore those. The \sys{State} panel in the right-hand column is showing this:
 \begin{figure}[h]
-    \includegraphics[width=0.75\linewidth]{state-panel.png}
+    \includegraphics[width=0.75\linewidth]{TEXT/C01/Images/state-panel.png}
 \end{figure}
 
 That's telling you a lot. Isabelle has two main modes, `state' and `prove'. (Those are both verbs, not nouns!) In the first, it wants you to state something (which you'll then prove); in the second, it wants you to set about proving one or more things; those things are called \textit{goals} or \textit{subgoals}. In this particular case, we have one goal, which is our current theorem-statement. 
@@ -299,19 +299,19 @@ Try replacing the name ``example'' with ``instance''. What goes wrong? 
 We now have a subgoal to prove, and as it's mere algebra without any exponents, 'simp' can probably handle it. We add \isi{by simp} on the next line, and see what happens. The \sys{Output} now looks like this:
 
 \begin{figure}[h]
-    \includegraphics[width=0.5\linewidth]{proof-state.png}
+    \includegraphics[width=0.5\linewidth]{TEXT/C01/Images/proof-state.png}
 \end{figure}
 
 We have a fact called \isi{example}; the current state of things is that we know a fact (the most recent fact is called \isi{this}), and we have a \textit{goal} that we still haven't proved, so we're obliged to do so. With our fact in hand, this \textit{should} be easy. (Note, by the way, that Isabelle has reversed the direction of the inequalities; it always replaces greater-than with less-than!)
 
 This time, we want to assert the overall goal as the next thing to prove, and because we're demonstrating the proof of some \textit{goal}, we use \isi{have} instead of \isi{show}. We \textit{could} retype the overall goal (or copy-paste it from the output panel!) as in 
 \begin{figure}[h]
-    \includegraphics[width=0.5\linewidth]{bad-show.png}
+    \includegraphics[width=0.5\linewidth]{TEXT/C01/Images/bad-show.png}
 \end{figure}
 
 But it's more idiomatic to write this:
 \begin{figure}[H]
-    \includegraphics[width=0.75\linewidth]{good-show.png}
+    \includegraphics[width=0.75\linewidth]{TEXT/C01/Images/good-show.png}
 \end{figure}
 
 That \isi{?thesis} is shorthand for ``the most recent thing we promised to prove'', more or less. 
@@ -320,7 +320,7 @@ We can complete the proof with \isi{using example by blast}. The \isi{using} add
 
 A challenge for beginning Isabelle-users is figuring out ``by WHAT???'', because there's \isi{simp}, \isi{auto}, \isi{blast}, \isi{metis}, \ldots  and (a) each of them overlaps with the others to some degree and (b) the names don't really disclose what each one does unless you know more about logic-and-computation than do most mathematicians. I confess that I often use \isi{try0}, so in this case I'd type \isi{using example try0}. The result is a flood of successful proofs:
 \begin{figure}[h]
-    \includegraphics[width=0.75\linewidth]{flood.png}
+    \includegraphics[width=0.75\linewidth]{TEXT/C01/Images/flood.png}
 \end{figure}
 
 You can see that this is an easy problem for \isi{blast}, and harder for \isi{fastforce}, and even harder for \isi{presburger} (indeed, that last approach is probably ignoring our 'example' fact and just proving the whole theorem from scratch as it did in the first lemma, \isi{evens}).
@@ -329,7 +329,7 @@ And while I \textit{do} use \isi{try0}, I also try to \textit{avoid} using it an
 
 So now we have a complete proof:
 \begin{figure}[h]
-    \includegraphics[width=0.75\linewidth]{proof1.png}
+    \includegraphics[width=0.75\linewidth]{TEXT/C01/Images/proof1.png}
     \caption{Our first complete proof!}
     \label{fig:first-proof}
 \end{figure}
@@ -363,7 +363,7 @@ Consider the cases $k = 0$ and $k > 0$. In the first case, $n = 1$ satisfies $2n
 
 Here's that proof, in Isabelle:
 \begin{figure}[h]
-    \includegraphics[width=1\linewidth]{proof2.png}
+    \includegraphics[width=1\linewidth]{TEXT/C01/Images/proof2.png}
     \caption{A proof by cases}
 \end{figure}
 
@@ -375,7 +375,7 @@ The proof, in Isabelle:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\linewidth]{proof3.png}
+    \includegraphics[width=0.75\linewidth]{TEXT/C01/Images/proof3.png}
     \caption{A proof by induction}
 \end{figure}
 
@@ -403,11 +403,11 @@ Let's review a few key points from this chapter:
     \item If you can't prove something, \isi{oops} is a good way to tell Isabelle to forget all about it. \isi{sorry} is a less-good way, but frequently useful.
     \item Non-keyword text in an Isabelle document generally needs double quotation marks around it. (We'll learn later to use `cartouches' as an alternative.)
     \item You've seen two forms of proof, one of which omits the word \isi{proof} and simply says something like \isi{by auto}; the other one starts with \isi{proof} and ends with \isi{qed}
-    \item Within proofs, there are various 'provers' named simp, auto, blast, metis, etc., that are good at different things, and you'll need to learn which ones are good at which things. For now, that's just a big pile of words. 
+    \item Within proofs, there are various 'proof methods' named simp, auto, blast, metis, etc., that are good at different things, and you'll need to learn which ones are good at which things. For now, that's just a big pile of words. 
     \item When you're in a state of affairs that requires a proof (the proof-state panel says \sys{proof (prove)}), you can type \isi{try} or (better in general) \isi{try0} to see whether Isabelle can find an easy proof for you. 
     \item Proofs can have various structures (cases, contradiction, induction, \ldots ) and each has its own way of being written in Isabelle. 
     \item During a proof, there are goals and subgoals, and your aim is to eliminate all of them. 
-    \item You've learned about quite a few Isabelle keywords -- theory, imports, begin, end, lemma, using, by, proof, have, show, case, let, obtain -- although the details of most are still to be disclosed. 
+    \item You've learned about quite a few Isabelle keywords -- \isi{theory}, \isi{imports}, \isi{begin}, \isi{end}, \isi{lemma}, \isi{using}, \isi{by}, \isi{proof}, \isi{have}, \isi{show}, \isi{case}, \isi{let}, \isi{obtain} -- although the details of most are still to be disclosed. 
     \item You're ready to do some proofs on your own as homework or better, as ``drill'' to help get some patterns into your head. 
 \end{itemize}
 
@@ -420,8 +420,10 @@ Finally, I want to note that absolutely nothing we've done so far matches a typi
     \item Type enough into the file to make it a valid theory file (i.e., something beginning with the word \isi{theory} and ending with \isi{end}, and having all keywords highlighted by Isabelle.)
     \item Here's a tiny theorem: \textit{For any natural number n, there's an odd number larger than n. }And here's a proof:\textit{ The number 2n + 1 is an odd number larger than n. }
 
-State and prove this theorem using this proof, in Isabelle, using a proof that starts with the word \isi{proof} rather than just \isi{by}. Try to do it without using \isi{try} or \isi{try0}. Call your theorem \isi{odds}.
+State and prove this theorem using this proof, in Isabelle, using a proof that starts with the word \isi{proof} rather than just \isi{by}. Try to do it without using \isi{try} or \isi{try0}. Call your theorem \isi{odds}. 
 
+\item Change the first word of your theorem statement from \isi{theorem} to \isi{lemma} or vice versa to see that the results are identical. The word \isi{proposition} can also be used. 
+ 
 \item Here's another theorem: The square of any natural number is nonnegative. State and prove this in Isabelle. To write the square of a number b, for now just use \isi{b * b}. Hint: to get the ``greater-than-or-equal'' symbol, type `\textbackslash{}ge' and pause until a completion/substitution is offered, and then press TAB. And to indicate that $n$ is a natural number, use \isi{n::nat}, which must be in parentheses to make parsing reasonable. Go ahead and use a \isi{by} proof, because you don't yet know how to find a theorem that says that the product of non-negatives is non-negative, or that naturals are closed under multiplication, but both are true and known within \isi{Main}. Looking at the hints provided by \sys{Auto solve\_direct} will give you some feel for the kinds of facts that are available to you. 
 
 \end{enumerate}
