@@ -15,10 +15,12 @@ The text in this book uses formatting as a guide to content. New terms, for inst
 I hope you'll treat reading this book as an \emph{interactive experience}, one where every time you see something new, you'll try it out. To encourage this, I'll sometimes include \term{tasks}, which are things I want you to do right at some particular moment in your reading. The end of a task is marked with a black square. Here's a first one:
 
 \task
-As you read this chapter, use Isabelle to do exactly what's described in the text. When I say ``Now delete both \isi{sorry} and the \isi{thm} line,'' you should be editing the text in an Isabelle editor-buffer. 
+As you read this chapter, use Isabelle to do exactly what's described in the text. When I say ``Now delete both \isi{sorry} and the \isi{thm} line,'' you should be editing the text in an Isabelle editor-buffer. Your first step, and the one I am least able to help you with, is to start Isabelle on your computer. 
 \etask
 
-Go ahead and start Isabelle 2023, and you'll see an interface that looks like this:
+Pretty much everything in this book looks the same in Isabelle2023 and Isabelle2024, and will probably look very similar in Isabelle2025. Pick the current latest stable edition of Isabelle, install it, and start it to complete the task. If you're on a Mac, you may have to grant Isabelle various permissions in the Mac's\co{Control Panel...Security} interface to make everything work properly. 
+
+Once you've started up Isabellel, you'll see an interface that looks like this:
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.7\linewidth]{TEXT//C01//Images/interface.png}
@@ -27,25 +29,30 @@ Go ahead and start Isabelle 2023, and you'll see an interface that looks like th
 \end{figure}
 In the left column are various documents you can look at. About halfway down, in bold, is \textbf{prog-prove}\textit{\textbf{,}} a book about programming and proving in Isabelle/HOL, which will almost certainly be useful to you at some point, as it is to me. But when I first tried reading it, I rapidly gave up and decided that someone needed to write \textit{this} book instead. 
 
-
 The top half of the center column is an \sys{Editor} panel -- in it you can type Isabelle documents (which Isabelle folks call \term{theory documents} or \term{proof documents}). As you do so, other threads of execution are constantly processing what you've written and changing the appearance of the editor text -- perhaps color-coding some text, or making red marks along the right-hand side of the document, or generating \textit{output}, which is one of the things that you can see in the other center-column window at the bottom. You can see above that I've got \sys{Output} highlighted; you can actually select \sys{Query}, \sys{Sledgehammer}, or \sys{Symbols} instead. For now, let's stick with \sys{Output}. 
 
-Right here I want to have you do something important. Near the top right of the 
+Right here I want to have you do something important. 
+
+\task
+Near the top right of the 
 \sys{Output} panel, you can see this:
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.75\linewidth]{TEXT/C01//Images/image.png}
 \end{figure}
-\textit{Be sure that \sys{Proof state} and \sys{Auto update} are both checked.} In everything I write from now on I'll assume that you've done this, so do it now! [Why? Because as you work, you'll constantly be looking at this panel, and having it update as you type, rather than requiring a cursor-motion-and-click, is really nice. Checking \sys{Proof state} says that you'd like to see a little more than the bare minimum feedback, which saves you from looking at \textit{another} panel all the time.]
+\textit{Be sure that \sys{Proof state} and \sys{Auto update} are both checked.} 
+\etask
+
+In everything I write from now on I'll assume that you've done this, so do it now! [Why? Because as you work, you'll constantly be looking at this panel, and having it update as you type, rather than requiring a cursor-motion-and-click, is really nice. Checking \sys{Proof state} says that you'd like to see a little more than the bare minimum feedback, which saves you from looking at \textit{another} panel all the time.]
 
 Moving on, there's the column on the right. \sys{Auto update} is checked, because that's how you'll usually want things. At the right hand side are choices of what to display in the main panel of that column: \sys{Hypersearch Results}, \sys{Sidekick}, \sys{State}, or \sys{Theories}. For now, we'll go with \sys{State}. Down at the bottom are some bits of information: the current time, how much memory various parts of Isabelle are using, etc. 
 
-In the middle column, the top panel show the currently-active file-name at the top (\co{Untitled-1 (\~/)}; if you look to the right of that filename, you'll see a down-arrow that you can click to discover that there may be other editor buffers available for you to look at as well. When I click on mine, I see this:
+In the middle column, the top panel shows the currently-active file-name at the top (\co{Untitled-1 (\~/)}; if you look to the right of that filename, you'll see a down-arrow that you can click to discover that there may be other editor buffers available for you to look at as well. When I click on mine, I see this:
 \begin{figure}
     \centering
     \includegraphics[width=1\linewidth]{TEXT/C01//Images/file-list.png}
 \end{figure}
-which tells me that in addition to the \co{Untitled-1} document, I've also got open \co{Scratch.thy}. By moving my cursor over that and releasing, I can switch to showing that document if I like. Using the \sys{File} menu, you can open a new document (it'll be called \co{Unititled-2}) and toggle between the two of them if you like.
+which tells me that in addition to the \co{Untitled-1} document, I've also got open \co{Scratch.thy}. By moving my cursor over that file name and releasing, I can switch to showing that document if I like. Using the \sys{File} menu, you can open a new document (it'll be called \co{Unititled-2}) and toggle between the two of them if you like.
 
 In general, dropdowns like this abound. There's another at the top of the lower center panel, and near the top of the right panel. 
 
@@ -92,7 +99,9 @@ To the left are two small markers that look like a circle with a `$-$' in it, an
     \includegraphics[width=0.5\linewidth]{TEXT/C01//Images/folded-theory.png}
 \end{figure}
 \noindent which tells you that the first bit of the file has been ``folded up'' and 1 line is now hidden. I can expand it again by clicking on the circled `$+$'. This can be helpful in longer documents for hiding all except the part that you're interested in at some moment. 
-
+\task
+Do everything described so far, so that you have your own theory document, and an \isi{imports} line, and a \isi{begin/end} pair,etc.
+\etask
 By the way, using \isi{imports Main} means that we'll have all sorts of useful facts at our disposal when we want to start writing and proving theorems. An example of this useful stuff is the natural numbers, 0, 1, 2, \ldots  and so on. Those have been defined, and various facts about them proven already, and the theory called \isi{Main} contains these definitions and proofs. (The real and complex numbers are \textit{not} defined in \isi{Main}, by the way; for that you need \isi{Complex_Main}.) You can also leave the space after \isi{imports} blank, but you'll find it's hard to do much of anything, because so many important tools are in \isi{Main}.
 
 Every theory file must have an \isi{imports} line. If you want to import more than one theory, you just write them one after another, separated by spaces. So 
@@ -163,7 +172,7 @@ There are three things you can do to address this red stuff in the interface, wh
 
 \begin{itemize}
     \item Write a proof of the lemma
-    \item Give up on the lemma by typing \isi{oops} after it, which says to Isabelle ``I don't know how to prove this, so just forget I ever mentioned it, OK?'' 
+    \item Give up on the lemma by typing \isi{oops} after it, which says to Isabelle ``I don't know how to prove this, so just forget I ever mentioned it, OK?''  That's useful when you're trying to formulate a statement clearly, but haven't yet worked it out in detail, but also don't want to delete what you've written, \textit{or} have it influence anything that follows. If you were writing a computer program, this would be like "commenting out" a section of your program. 
     \item  (somewhat risky) Assert that you'd like to \textit{pretend} you have a proof, so that you can use this lemma in further work, and you'll get back to proving it properly later. For this, you type \isi{sorry}.
 \end{itemize}
 

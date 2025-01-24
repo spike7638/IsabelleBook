@@ -1,12 +1,12 @@
 \chapter* {Preface}
 
-I'm assuming you're reading this because you want to try using a proof assistant (PA) and like me, you're someone who already knows how to write proofs of interesting things. My own interests are geometry and topology, just to set some context. I ``learned logic" in 10th grade when we studied Euclidean Geometry. Since those days, I've drifted off and become a computer scientist, and nowadays proof-assistants are used to show many things about computer programs (e.g., ``This program terminates on any input" or ``the state of this filesystem after a `save' operation is what you expect it to be" or ``if you reverse a list twice, you end up with the list you started with."), but those kinds of proofs hold almost no interest for me.
+I'm assuming you're reading this because you want to try using a proof assistant (PA) and like me, you're someone who already knows how to write proofs of interesting things. My own interests are geometry and topology, just to set some context. I ``learned logic" in 10th grade when we studied Euclidean geometry. Since those days, I've drifted off and become a computer scientist, and nowadays proof-assistants are used to show many things about computer programs (e.g., ``This program terminates on any input" or ``the state of this filesystem after a `save' operation is what you expect it to be" or ``if you reverse a list twice, you end up with the list you started with."), but those kinds of proofs hold almost no interest for me.
 
 They are (especially the last one) the starting point for most presentations about proof-assistants. The proofs are usually inductive, and many PAs have really great tools for doing inductive proofs. So the introductory presentations harp on and on about induction, and I just can't get much out of them. I've written several papers in math journals, and none of them use induction, and I assume this is true for a lot of mathematicians. 
 
 Other introductory texts on PAs concentrate on \textit{logic}. I know about things like ``modus ponens'' and truth tables and showing that $p \implies q$ is the same as $\neg q \implies \neg p$. But again like many mathematicians, I don't know much about the modern study of logic. I don't lose sleep over the axiom of choice, or constructivism. I mostly just want to get on with proving things about manifolds. But these logic-motivated books tend to start with 30 pages of examples that appear in logic texts, like the theorem that $p \implies  (p \implies p)$ and show how to prove them, and my eyes glaze over once again. 
 
-My goal in writing these notes is to help others like me who want to use a proof assistant, and I'm writing about Isabelle because it seems like the one most likely to be useful to me. 
+My goal in writing these notes is to help others like me who want to use a proof assistant to do mathematics other than logic, and I'm writing about Isabelle because it seems like the one most likely to be useful to me. 
 
 Of course, some understanding of some logic is necessary to make progress with Isabelle, so I'll have to discuss it at some point. 
 
@@ -26,7 +26,7 @@ We'll start with a tour of Isabelle with a little description of what's going on
 
 \subsection{What using Isabelle looks like}
 
-The general idea in Isabelle is that at any moment, there's something you want to show is true (a goal), and to do so, you can take several possible approaches: 
+The general idea in Isabelle is that at any moment, there's something you want to show is true (a \textit{goal}), and to do so, you can take several possible approaches: 
 
 \begin{itemize}
     \item 
@@ -36,7 +36,7 @@ You can build up one fact after another, each getting closer and closer to the t
 \item
 You can start with the left-hand-side of some alleged equality and do lots of steps of algebra to eventually convert it to some desired right-hand-side. (Although many mathematicians are quite good at this, it's not actually a place where Isabelle particularly shines.) 
 \item 
-You can start with some complex entity and repeatedly simplify it until you get what you want. Think of proofs of trig identities, where one constantly ends up factoring out $sin^2(t) + cos^2(t)$  -- where $t$ could be anything --  and then replacing that combination with the number $1,$ yielding a simpler expression, etc., etc.
+You can start with some complex entity and repeatedly simplify it until you get what you want. Think of proofs of trig identities, where one constantly ends up factoring out $sin^2(t) + cos^2(t)$  -- where $t$ could be anything --  and then replacing that combination with the number $1,$ yielding a simpler expression, etc.
 \end{itemize}
 The facts Isabelle has on hand, the various tools developed to manipulate those, and the syntax of Isabelle proofs itself are the tools we (the user and Isabelle) have to work with to address the goals of our work, the usual goal being ``the theorem we're trying to prove happens to be true". 
 
@@ -52,7 +52,7 @@ That brings up another point. There's an old joke about a guy who needs a suit t
 
 Sometimes Isabelle feels that way to me: you take some nice mathematics, and to formalize it you have to twist it almost beyond recognition. At that point, the proofs become easier, but the mathematical ideas are almost unrecognizable. You'll find me mentioning the tailor more than once in these notes.
 
-To be honest, though, a lot of the time using Isabelle feels a bit like a computer game, and you can find yourself up late and night saying ``Wait! I'll just prove \textit{one more} little lemma before I go to bed!" It's pretty addictive, and I think that's a good thing, and it's why I pushed myself to learn more of it.  
+To be honest, though, a lot of the time using Isabelle feels a bit like a computer game, and you can find yourself up late and night saying ``Wait! I'll just prove \textit{\textbf{one} more} little lemma before I go to bed!" It's pretty addictive, and I think that's a good thing, and it's why I've pushed myself to learn more of it.  
 
 \subsubsection{Credit}
 Even in its current infantile form, this set of notes make sense in part because of the help I've received from a bunch of folks --- there are whole sections that are nearly verbatim from emails they've sent, or answers they've given on Zulip Chat, etc. First among these is Manuel Eberl, who has been willing to guide me through forests of ignorance. Gunnar Teege's own notes on Isabelle (and email exchanges) have been very valuable. Dan Dougherty and Tim Nelson have both helped me realize how little I know about logic and improved that situation immensely -- Dan seems to have a talent for knowing the language that I'll understand when he's explaining things, and if you look up ``patience" in the dictionary, you'll find Tim's picture. Eugene Stark marked up a few hundred lines of Isabelle that I wrote in about 2018 -- documents so horrible that they must have made his eyes bleed -- and either made notes on or rewrote large sections, helping me learn some of the idioms and approaches that I now rely on. Mathias Fleury's numerous and helpful comments in Zulip chat have also had a substantial influence on the form and content of these notes. 
