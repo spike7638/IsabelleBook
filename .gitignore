@@ -2,6 +2,12 @@
 *~
 \#*
 
+## Isabelle-related documents
+*.marks
+
+## Mac-related documents
+*.DS_Store
+	
 #Latex-related stuff
 *.aux
 *.lof
