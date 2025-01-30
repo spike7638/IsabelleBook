@@ -318,3 +318,83 @@ Why does it break the proof of the next lemma when we add ``negation'' to the si
 Time to talk about what various provers are doing: auto does a lot of simplification (using what rules? WE get to tell it!) Blast is similar, but doesn't know about equality. 
 
 And now we can say what ``using'' is doing: it's saying to the prover ``here's a fact you might find useful''\ldots which the prover may ignore. By contrast, there's a similar thing, 'unfolding': this replaces function applications with their definitions (or more generally, the left side of an equality with the right side). 
+
+\subsection{The triangle inequality}
+Having worked through a few pages of Spivak in detail, I really wanted to finish the triangle inequality proof. Spivak's own proof turned out to be messy for me to write, so I came up with my own. It was based on a few key lemmas: 
+\begin{enumerate}
+    \item For $x$ nonnegative, we have $|x| = x$.
+    \item For $x$ negative, we have $|x| = -x$.
+    \item For all $x$, we have $x \le |x|$.
+    \item For all $x$, we have $|x| = |-x|$
+\end{enumerate}
+Now if $x+y$ is nonnegative, we have
+$$
+|x+y| = x + y
+$$
+by the first rule, and each of $x$ and $y$ is no larger than its absolute value, so we have $$
+x + y \le |x| + |y|,$$
+and we're done with this case. Hidden in there was the transitivity of less-than-or-equal, and the fact that if $a \le b$ and $c \le d$ then $a + c \le b + d$, small lemmas I had to prove along the way. 
+
+What if $x + y$ is negative? Then we can apply the first case to $-(x+y) = -x + -y$, to conclude that 
+$$
+|-(x+y)| \le |-x| + |-y|.$$
+
+The left hand side is the same as $|x+y|$ by the fourth lemma. The right hand side is the same as $|x| + |y|$, by the fourth lemma, applied twice. And that concludes the proof. 
+
+In a math text, I might have written "To prove the triangle inequality, it suffices to prove it when $x + y$ is nonnegative, because if it's negative..." and then followed with the previous two paragraphs. In Isabelle, I can mimic the same thing using the keyword \isi{presume}. The theorem might look like this:
+\begin{IS}
+theorem triangle_inequality:
+  fixes x y
+  shows "abs(x + y) le abs(x) + abs(y)"
+\end{IS}
+where \isi{abs} has already been defined as the absolute value function, and \isi{le} has been defined as less-than-or-equal. Let's also suppose that \isi{ge} has been defined as greater-than-or-equal, and \isi{Z} is, as before, or symbol for zero. The proof might continue
+\begin{IS}
+theorem triangle_inequality [known]:
+  fixes x y
+  shows "(abs (x ⊕ yb)) le  ((abs x)  ⊕ (abs y))"
+proof -
+  presume A: "⟦x gt Z; y gt Z⟧ ⟹ (abs (x ⊕ y)) le  ((abs x)  ⊕ (abs y))"
+  show ?thesis  
+  proof -
+    \textit{lots of steps here, some using the presumed fact A}
+  qed 
+next
+  show "⟦x gt Z; y gt Z⟧ ⟹ (abs (x ⊕ y)) le  ((abs x)  ⊕ (abs y))"
+  proof -
+     \textit{lots of steps here too}
+  qed
+qed
+\end{IS}
+
+The "presumes" part is just another way of writing the fixes-assumes-shows statement of a theorem that we've already seen --- between the double brackets are the 'assumes' parts separated by semicolons; the long double arrow means "shows", and the conclusion is on the right. Once we've presumed something
+we can use it in a proof. When we're done concluding the main claim, we still need to go back and prove the bit that "it suffices to show" --- that's the part following the \isi{next}. Unfortunately, the name \isi{?thesis} doesn't get bound to this, so we have to explicitly re-state the presumed fact. 
+
+This conversion of our "it suffices to show" proof into Isabelle is a little awkward, and if we'd said in some proof "to prove C, it suffices to prove A and B, because ...", i.e., if we'd had \textit{two} presumptions, then things are even messier. My personal (regretful) conclusion is that it's best to separate the presumed fact out into a lemma, and then apply it in the proof of the main theorem. 
+
+\subsection{Fact sets, proof structures}
+In the course of doing the triangle inequality proof, I found a \textit{ton} of little lemmas that I needed, like "if x is greater than y, then x is \textit{not} less-than-or-equal-to y", and "if x is greater than y, then x is greater-than-or-equal-to y". When you introduce something like "less than", it's worth proving as many tiny facts about it as possible, so that its definition is almost beside the point. 
+
+One consequence of this is that I ended up using the sidekick a lot --- it's a quick table of theorems that you can click on to jump to a definition. (Once you jump there, you can use the arrow buttons on the menu bar to jump back to where you were just working!) Even with this help, things felt slow. So I did an experiment. 
+
+What if, as I was trying to prove a lemma, all the prior lemmas were in the collection of known facts for me to use? Just as you can add a lemma to the simpset that the simplifier uses, you can create your own fact set and add things to it. I typed \isi{named_theorems known} to create a new set of facts with the not-very-inventive name `known'. Note: \isi{named_theorems} is another Isabelle/Isar keyword. 
+
+Then each time I wrote a lemma, I'd include `known' like this: \isi{lemma le_gt [known]:}, which would add the lemma \isi{le_gt} to my fact-set once it was proved. Unfortunately, there was no way to do something this simple with definitions, so after a definition, I'd have to write
+\begin{IS}
+definition le::"r ⇒ r ⇒ bool"
+  where "le a b = ge b a" 
+
+declare le_def[known]
+\end{IS}
+Here the keyword \isi{declare} is used to say that you want to add \isi{le_def} (the "fact" that \isi{le} is defined as shown above, automatically created whenever anything is defined) to the fact-set \isi{known}. 
+
+With this done, most of the proofs became simply something like
+\begin{IS}
+proof -
+  show ?thesis using known assms by auto
+qed
+\end{IS}
+No more 12-line proofs! Far fewer case-based proofs! It's wonderful! 
+
+To be fair, I should say that it's not completely wonderful. Sometimes the \isi{by auto} had to be \isi{by metis}, or \isi{by meson}, and I had to find those things using \isi{try} or \isi{sledgehammer}. And the resulting proof gives no clue to the reader about what facts were actually needed, and what others were just along for the ride. Finally, there's clearly a limit to this approach --- what happens when your fact set has 10,000 items in it? Well, that's the situation that sledgehammer lives with: it's got everything proved so far in any included theory, and every named theorem from the current theory, in its toolbox. It takes a while to come up with proofs, too. Finally, the proof-state display gets so cluttered that it's almost impossible to read, which is bad when you reach a situation where you have to nudge things along by hand. 
+
+In short: it was an interesting experiment, but it's not the way to work in general. 
