@@ -8,9 +8,6 @@ locale affine_plane_data =
   fixes find_parallel:: "'l \<Rightarrow> 'p \<Rightarrow> 'l"
 begin
 
-
-
-
 definition parallel::"'l \<Rightarrow> 'l \<Rightarrow> bool"  (infix "||" 5)  where
   "parallel l m = (if (l \<in> Lines \<and> m \<in> Lines) 
   then l = m \<or> \<not> (\<exists> P. P \<in> Points \<and> meets P l \<and> meets P m) else undefined)"
@@ -61,23 +58,6 @@ locale affine_plane =
     a2c: "\<lbrakk> P \<in> Points; l \<in> Lines\<rbrakk> \<Longrightarrow>  meets P (find_parallel l P)" and
     a3: "\<exists>P Q R. P \<in> Points \<and> Q \<in> Points \<and> R \<in> Points \<and> P \<noteq> Q \<and> P \<noteq> R \<and> Q \<noteq> R \<and> \<not> (collinear P Q R)"
 begin
-(* to do
-define "liesOn", "contains", join(P, Q), crossing(n, k)
-.Show join(P, Q) = join(Q, P); 
-x crossing(n, k) = crossing(k, n). 
-P liesOn m <-> m contains P, 
-x n contains crossing(n, k) 
-x k contains crossing(n, k)
-.join(P, Q) contains P
-.join(P, Q) contains Q
-*)
-
-(*
-fun crossing:: "'l \<Rightarrow> 'l \<Rightarrow> 'p" where
-  crossing n k = (if (n \<in> Lines \<and> k \<in> Lines \<and> \<not>(n || k)) 
-  then l = m \<or> \<not> (\<exists> P. P \<in> Points \<and> meets P l \<and> meets P m) else undefined)"
-*)
-
 
 lemma join_symmetric: 
   fixes P Q
