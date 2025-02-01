@@ -139,15 +139,15 @@ where the double-brackets indicate a list of things we need to know in order to 
 
 That double-bracket form is often replaced, much to my consternation when I was starting out, with this: 
 
-\begin{is}
+\begin{IS}
     P ===> Q ===> R
 
-\end{is}
+\end{IS}
 which doesn't seem at all the same. Once you realize that the arrows associate to the right, this says \isi{P ===> (Q ===> R)}, or in English, ``Knowing $P$ lets you conclude that if you know $Q$, then you know $R$'', or, in simpler terms, ``knowing both $P$ and $Q$ lets you conclude $R$.'' In much the same way, it could be replaced with ``\isi{Q ===> (P === R)}'', which is also equivalent. 
 
 To do: the problem when you want to unify P with this second form. Solution: you can rotate the assumptions (see zulip)
 
-In much the same way, in propositional logic, $(p -> q) -> r$ is the same as $$(p  \wedge  q) -> r$.
+In much the same way, in propositional logic, $(p -> q) -> r$ is the same as $(p  \wedge  q) -> r$.
 
 There's one more aspect to HOL that we've used but that I haven't mentioned: there's a notion of types, like int, or nat, or bool, and ways to construct new types from old (as in ``int set'' or ``int => nat''), and everything in HOL has a type. In ordinary propositional logic, if you want to claim that for natural numbers, n < 2n+1, you have to say ``for all $n$,  $n$ is a natural number implies that  $n < 2n + 1$.'' In HOL, you say ``for all naturalnumbers $n$, $n < 2n + 1$''. That saves a lot of grief in trying to express things, which you'll grow to appreciate. 
 
@@ -155,7 +155,7 @@ To do: ConjI and ConjE and AllI using \ldots however you search! \ldots  and giv
 
 \section{More Interface Bits and Pieces}
 
-While you were working through those proofs from Spivak, you probably got to the point where you said ``Hey\ldots was ``lt'' defined in terms of ``gt'' or the other way around? And was the rule for multiplication being commutative called ``mul_commute'', ``mult_com'', or one of 15 other possible variants? This is where the ``sidekick'' panel on the right comes in: it shows you everything in your theory. Want to jump to the definition of ``neg''? Click on it! By the way, if the Sidekick panel seems to not match what you've been typing, save your document, and the Sidekick contents will be refreshed. (Apparently updating while you're typing is problematic in some way, so it's only triggered on save.)
+While you were working through those proofs from Spivak, you probably got to the point where you said ``Hey\ldots was ``lt'' defined in terms of ``gt'' or the other way around? And was the rule for multiplication being commutative called ``\co{mul_commute}'', ``\co{mult_com'}', or one of 15 other possible variants? This is where the ``sidekick'' panel on the right comes in: it shows you everything in your theory. Want to jump to the definition of ``neg''? Click on it! By the way, if the Sidekick panel seems to not match what you've been typing, save your document, and the Sidekick contents will be refreshed. (Apparently updating while you're typing is problematic in some way, so it's only triggered on save.)
 
 Speaking of remembering/discovering things, if you open a proof document and (on a mac) press the command key (CTRL on Windows) while your cursor is above some term, you'll see something like this:
 
@@ -163,7 +163,7 @@ Speaking of remembering/discovering things, if you open a proof document and (on
 
 (I had command-hovered above the term ``A4complement'' to produce this.) Isabelle is telling me that this is a defined constant, namely a function from type a4Line to a4Line. This works in many panels of the interface, although I mostly use it in the main editor panel. 
 
-On a closely-related note, sometimes you want to do the opposite thing: you want to do something to simplify an expression or prove a fact, and you know that the thing you need is (in the Spivak example) something to do with negation. But you cannot recall what small negation theorems you've already proved. You can, in a part of your proof document where you'd normally type a new theorem (right above the theorem you're currently working on is a good choice!) type ``find_theorems neg''. Here, in a draft for a homework problem for this chapter that's based on the Spivak work you already did, is the result:
+On a closely-related note, sometimes you want to do the opposite thing: you want to do something to simplify an expression or prove a fact, and you know that the thing you need is (in the Spivak example) something to do with negation. But you cannot recall what small negation theorems you've already proved. You can, in a part of your proof document where you'd normally type a new theorem (right above the theorem you're currently working on is a good choice!) type \co{find_theorems neg}. Here, in a draft for a homework problem for this chapter that's based on the Spivak work you already did, is the result:
 
 In the document itself:
 
@@ -172,13 +172,13 @@ In the output panel:
 
 You'll notice that Isabelle has changed neg into ``neg'', and that's a general hint: the thing you're searching for may need parens. If at the same point I search for ``plus'', I get this:
 
-where I've only shown the first two results. Isabelle has helpfully replaced ``plus'' with the special syntax we assigned to it; the extra parens around the symbol are there to make it into an infix operation (this is a messy detail that I'm not going to go into here). If you had tried typing
-find_theorems  ⊕
-You'd get an error message, because that symbol is just a bit too hard for Isabelle to deal with without it explicitly being identified as so-called 'inner syntax', i.e., the part of Isabelle that isn't ``theorem, using, by, fixes, assumes, shows, proof, have, show hence, qed''. But in fact if you type 
-
-find_theorems "⊕"
-
-you'd also get an error message, because Isabelle needs those extra parens to recognize that ⊕ is the naming the infix addition function. 
+where I've only shown the first two results. Isabelle has helpfully replaced ``plus'' with the special syntax we assigned to it; the extra parens around the symbol are there to make it into an infix operation (this is a messy detail that I'm not going to go into here). If you had tried typing \co{find_theorems} followed by the circled-plus-sign
+you'd get an error message, because that symbol is just a bit too hard for Isabelle to deal with without it explicitly being identified as so-called 'inner syntax', i.e., the part of Isabelle that isn't ``theorem, using, by, fixes, assumes, shows, proof, have, show hence, qed''. But in fact if you type 
+\begin{IS}
+find_theorems 
+\end{IS}
+followed by the circled-plus in double-quotes,
+you'd also get an error message, because Isabelle needs those extra parens to recognize that the circled-plus is the naming the infix addition function. 
 
 Isabelle syntax oddities
 I mentioned above that certain words --- things that show up in boldface in the interface --- are part of Isabelle's 'outer syntax', what you might think of as the syntax of Isabelle itself, while the stuff we write as facts are statements about mathematics, like ``a * b = b * a''. Those, in Isabelle, are called inner syntax. But Isabelle is very general, and defining new syntax is a possibility, so it's tough to give a complete description of either. The Isabelle Reference Manuals (available in the Documentation tab of the left-hand column of the interface) do so, but they're not easy to read! 
@@ -205,19 +205,21 @@ shows "P=P"
 only then are the errors all finally resolved. To be honest, I frequently copy-paste a previous theorem or lemma and then adjust the theorem name and what's fixed, assumed, or shown, one at a time, so that there's a little bit less of this (and so that I type less boilerplate). 
 
 One more tip, although it's not actually an interface tip: you can put 
-declare [[show_types]]
+\begin{IS}
+    declare [[show_types]]
+\end{IS}
 near the top of a proof document and thereafter the output panel will show things like this after the \isi{plus_assoc} theorem has been 'sorried':
 
 If you want to show other things, you can extend the list, as in 
-
+\begin{IS}
 declare[[show_types, show_abbrevs, sh ...]]
-
-and as you type that last ``sh'' a list of other things you might want to show is offered as a tool-tip. I seldom use these, but show_types may be useful to you as you're getting started. 
+\end{IS}
+and as you type that last ``sh'' a list of other things you might want to show is offered as a tool-tip. I seldom use these, but \co{show_types} may be useful to you as you're getting started. 
 
 Getting to proofs faster and more simply
-One thing you might have learned from the Spivak proofs is that most of the time, you knew something (fact1) and you had something else (fact2) that relates this to some other thing, and you applied fact2 to fact1 to get some new ``fact1'' for the next step. There's seldom a 'big picture' situation where you needed to combine 7 things all at once to get an answer. On the other hand, if you resorted to sledgehammer, you found that it sometimes did exactly this combination of 14 different items to do a whole lot of steps privately and then just say ``yep\ldots I got it!'' You might be wishing you could do the same thing. But if you look at the proof state during the middle of a proof, there's typically just one fact in your bag of facts (``this''), and you have to pull in fact2 be realizing that some theorem could be applied to ``this'', or some definition would let you transform ``this'', etc. In the meantime, ``by auto'' seems to be doing a lot of things under the hood: if a simple deduction leads to (Z \notequal Z) \/ x \in P, for instance, ``auto'' may be able to conclude that x is in P, because the first clause of the ``or'' is false, so the second must be true. How's it doing that? 
+One thing you might have learned from the Spivak proofs is that most of the time, you knew something (fact1) and you had something else (fact2) that relates this to some other thing, and you applied fact2 to fact1 to get some new ``fact1'' for the next step. There's seldom a 'big picture' situation where you needed to combine 7 things all at once to get an answer. On the other hand, if you resorted to sledgehammer, you found that it sometimes did exactly this combination of 14 different items to do a whole lot of steps privately and then just say ``yep\ldots I got it!'' You might be wishing you could do the same thing. But if you look at the proof state during the middle of a proof, there's typically just one fact in your bag of facts (``this''), and you have to pull in fact2 be realizing that some theorem could be applied to ``this'', or some definition would let you transform ``this'', etc. In the meantime, ``by auto'' seems to be doing a lot of things under the hood: if a simple deduction leads to \co{(Z \notequal Z) \/ x \in P}, for instance, ``auto'' may be able to conclude that x is in P, because the first clause of the ``or'' is false, so the second must be true. How's it doing that? 
 
-Broadly speaking, many proofs in Isabelle amount to glorified simplification. That simplification might be as simple as replacing False \/ Q with just Q, or might be more complex, like replacing all occurrences of the ``difference'' function with their definition, i.e., diff a b ≡ (a ⊕ (neg b)). It might amount to replacing cos^2(t) + sin^2(t) with 1, where t could be some arbitrarily complicated expression. In all cases, one of the key points about simplification is that it should reduce some well-defined measure of complexity, i.e., always go downhill. You definitely don't want one of your simplification rules to be a + b = b + a, because that can be applied infinitely often without making any progress. 
+Broadly speaking, many proofs in Isabelle amount to glorified simplification. That simplification might be as simple as replacing \co{False \/ Q} with just Q, or might be more complex, like replacing all occurrences of the ``difference'' function with their definition, i.e., diff a b ≡ (a ⊕ (neg b)). It might amount to replacing \co{cos^2(t) + sin^2(t)} with 1, where t could be some arbitrarily complicated expression. In all cases, one of the key points about simplification is that it should reduce some well-defined measure of complexity, i.e., always go downhill. You definitely don't want one of your simplification rules to be a + b = b + a, because that can be applied infinitely often without making any progress. 
 
 Isabelle has a simplifier, and it's freaking amazing. It's at the heart of auto; it's what ``simp'' uses; it's part of lots of provers. It uses a set of simplification rules, often described as the ``simp set'' or ``simpset'', and you, the user, can add to that set of rules during a proving session. Adding a rule like ``a + b = b + a'' is a bad idea obviously, but saying ``let's always get rid of all occurrences of 'diff''' actually sounds pretty good. To add a theorem to the simpset, you put [simp] just before the colon, as in 
 
@@ -378,7 +380,9 @@ One consequence of this is that I ended up using the sidekick a lot --- it's a q
 
 What if, as I was trying to prove a lemma, all the prior lemmas were in the collection of known facts for me to use? Just as you can add a lemma to the simpset that the simplifier uses, you can create your own fact set and add things to it. I typed \isi{named_theorems known} to create a new set of facts with the not-very-inventive name `known'. Note: \isi{named_theorems} is another Isabelle/Isar keyword. 
 
-Then each time I wrote a lemma, I'd include `known' like this: \isi{lemma le_gt [known]:}, which would add the lemma \isi{le_gt} to my fact-set once it was proved. Unfortunately, there was no way to do something this simple with definitions, so after a definition, I'd have to write
+Then each time I wrote a lemma, I'd include `known' like this: \isi{lemma le_gt [known]:}, which would add the lemma \isi{le_gt} to my fact-set once it was proved. 
+
+Unfortunately, I didn't find an easy way to do something this simple with definitions, so after a definition, I'd have to write
 \begin{IS}
 definition le::"r ⇒ r ⇒ bool"
   where "le a b = ge b a" 
@@ -386,6 +390,13 @@ definition le::"r ⇒ r ⇒ bool"
 declare le_def[known]
 \end{IS}
 Here the keyword \isi{declare} is used to say that you want to add \isi{le_def} (the "fact" that \isi{le} is defined as shown above, automatically created whenever anything is defined) to the fact-set \isi{known}. 
+
+(It turns out that there \textit{is} a way to add an attribute to a definition, and it looks like this:
+\begin{IS}
+definition le::"r ⇒ r ⇒ bool"
+  where [known]: "le a b = ge b a" 
+\end{IS}
+which I find less satisfactory, because of the requirement of that extra colon -- it feels inconsistent with the syntax for attributes elsewhere. But clearly both are OK.)
 
 With this done, most of the proofs became simply something like
 \begin{IS}
@@ -395,6 +406,30 @@ qed
 \end{IS}
 No more 12-line proofs! Far fewer case-based proofs! It's wonderful! 
 
-To be fair, I should say that it's not completely wonderful. Sometimes the \isi{by auto} had to be \isi{by metis}, or \isi{by meson}, and I had to find those things using \isi{try} or \isi{sledgehammer}. And the resulting proof gives no clue to the reader about what facts were actually needed, and what others were just along for the ride. Finally, there's clearly a limit to this approach --- what happens when your fact set has 10,000 items in it? Well, that's the situation that sledgehammer lives with: it's got everything proved so far in any included theory, and every named theorem from the current theory, in its toolbox. It takes a while to come up with proofs, too. Finally, the proof-state display gets so cluttered that it's almost impossible to read, which is bad when you reach a situation where you have to nudge things along by hand. 
+To be fair, I should say that it's not \textit{completely} wonderful. Sometimes the \isi{by auto} had to be \isi{by metis}, or \isi{by meson}, and I had to find those things using \isi{try} or \isi{sledgehammer}. And the resulting proof gives no clue to the reader about what facts were actually needed, and what others were just along for the ride. Finally, there's clearly a limit to this approach --- what happens when your fact set has 10,000 items in it? Well, that's the situation that sledgehammer lives with: it's got everything proved so far in any included theory, and every named theorem from the current theory, in its toolbox. It takes a while to come up with proofs, too. Finally, the proof-state display gets so cluttered that it's almost impossible to read, which is bad when you reach a situation where you have to nudge things along by hand. 
 
 In short: it was an interesting experiment, but it's not the way to work in general. 
+
+\section{Beginner tips}
+When you start proving things in Isabelle, challenges abound. You get partway through a proof, and find that sledgehammer cannot complete it. You're trying to do an incredibly simple proof and "auto" can't seem to help. You look in the proof state and see that "this" is exactly your goal, but can't close out the proof. You see that you want to prove \isi{a ===> b}, and you've already established \isi{b}. Why isn't the overall goal obvious? 
+
+I cannot answer all these questions for you, because some depend on context, but I can give some hints. 
+
+\begin{itemize}
+    \item Watch for errors! If there's a red marker beside a line where you're trying to do a proof, move your cursor into that line and see what error appears in the output window. Fix it before trying to prove anything!
+
+    \item Use quotation marks! Consider the following small theorem:
+\begin{IS}    
+theorem join_containsL:
+  fixes P Q
+  assumes "P ≠ Q"
+  shows "P ≠ Q"
+proof -
+  show P ≠ Q using assms try 
+...
+\end{IS}
+The first mistake here is that you probably want to use the more idiomatic \isi{show ?thesis} as a matter of habit, but perhaps you're still learning and want to write out explicitly the thing you're trying to show. It seems totally obvious, but neither 'try' nor 'sledgehammer' can get anywhere. What's wrong? You need to put \isi{P ≠ Q} in quotes:
+\isi{show "P ≠ Q" using assms by auto} works fine. 
+
+\item Use Isabelle's color-coding hints! 
+\end{itemize}
