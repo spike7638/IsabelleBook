@@ -1,5 +1,8 @@
 \chapter*{To Do}
 \begin{itemize}
+\item 
+Stuff isabelle produces: what do def, fun, etc, insert into environment. How do simpset change with each "fun", etc. What does "quotient" and "lifting/transfer" produce? 
+\item page 31 of \|https://isabelle.in.tum.de/doc/tutorial.pdf|
 \item using sledgehammer: put after "using" or "unfolding" or "have ..." or "show ..." but NOT after "by"
 \item in sledgehammer, figure out how to turn on detailed feedback; apparently the magic settings are [verbose, debug] .
 \item point people to read the first few pages (up to the "options" section) of the sledgehammer manual: https://isabelle.in.tum.de/dist/doc/sledgehammer.pdf
@@ -27,6 +30,16 @@
 
 Pointer to isabelle community cookbook: https://isabelle.systems/cookbook
 
+"value" to use a debugging tool:
+
+datatype pointD = Hd | Ad | Bd | Cd| Dd| Ed| Fd| Pd | Qd |Rd
+definition PointsD::"pointD set"  where "PointsD = {Hd, Ad, Bd, Cd, Dd, Ed, Fd, Pd, Qd, Rd}"
+
+value "PointsD" produces
+"{Hd, Ad, Bd, Cd, Dd, Ed, Fd, Pd, Qd, Rd}"
+  :: "pointD set"
+
+  
 \subsection{Doing proofs right}
 Once you've done some more Spivak proofs ... we'll move into affine geometry. 
 To prove the affine plane on 4 points is an affine plane, we need to show all the axioms hold. The only really messy one is 
@@ -38,7 +51,7 @@ To prove the affine plane on 4 points is an affine plane, we need to show all th
 \end{verbatim}
 Proving a negation \textit{could} be done by expanding the definition of collinear (a conjunction of several items), negating it (using blast), and then showing that each of the resulting disjunction elements is false...but one of these is existentially quantified, so it becomes universally quantified, so it requires working through all possible lines one at a time. 
 
-Instead, the right approach is classical contradiction: we assume they ARE collinear, fix a line $n$ that contains all three, and show this leads to nonsense. (A simple way, in this case, is to observe that the cardinality of $n$ must be at least 3, but the cardinatlity of each line in A4 is exactly 2, but we instead work through the details because it's instructive for later proofs, and ISabelle is good at enumerate-and-check approaches.) 
+Instead, the right approach is classical contradiction: we assume they ARE collinear, fix a line $n$ that contains all three, and show this leads to nonsense. (A simple way, in this case, is to observe that the cardinality of $n$ must be at least 3, but the cardinatlity of each line in A4 is exactly 2, but we instead work through the details because it's instructive for later proofs, and Isabelle is good at enumerate-and-check approaches.) 
 
 Warning: I want to use ccontr to show the statement above. My first version said
 \begin{IS}
@@ -57,6 +70,25 @@ proof (rule ccontr)
 \end{IS
 i.e., simply put a negation sign in front of the desired goal. The fact that ¬¬ is the same as "no negations at all" eludes Isabelle (!)
 
+Need to discuss sledgehammer, and how it has access to a million facts, but won't always choose the one you need. Nudging it with a helpful "using" (esp. using XXX [of Y Z W]) can be a big help. Better still (according to Eberl) is to use specific tactics
+
+He says this: "-- I look at proofs in HOL-Algebra and ask myself "why aren't my proofs \newline
+-- ever that short?"
+
+Like most things, it's a matter of experience. You just learn how to
+write things down in ways that are nice and concise and perhaps easiest
+for the automation to deal with. And you learn how to use all the
+different tactics for the best effect. I for one am a big fan of doing
+every step in Isar by first using a very specific, predictable tactic
+like "rule", "intro", "subst" and then getting rid of the arising
+subgoals with something more hard-hitting and unfocused like "auto". I
+do occasionally use sledgehammer, but perhaps not as much as other
+people. I tend to not like the kinds of proofs it creates.
+
+--End of Eberl quote --
+
+
+tactic to learn: locale_unfolding
 
 
 
@@ -108,6 +140,26 @@ Example of sys code: \sys{ls ~jfh}.
 
 Example of Inline Isabelle code \isi{theory IbookCh0} and general Isabelle code:
 }
+
+"Where do I find a library that does X?" See \verb|https://isabelle.in.tum.de/library/HOL/index.html|
+
+Fix-assume-show notation: you can also include "defines":
+\begin{verbatim}
+lemma A2_vert5:
+  fixes x0 x1 :: real
+  defines l_form: ‹l ≡ A2Vertical x0› 
+  defines k_form: ‹k ≡ A2Vertical x1›
+  assumes ‹a2meets T l› and ‹a2meets T k›
+  shows ‹l = k› 
+  by (cases T) (use assms in auto)
+\end{verbatim}
+
+"How do I create a set using {x | x > 0} notation?" -- see https://isabelle.zulipchat.com/#narrow/channel/238552-Beginner-Questions/topic/Construction.20a.20set
+
+"How should I define my function (with "definition" or "fun" or "abbreviation" perhaps?) and why?" 
+
+"unfolding" vs "using"
+Lovely problem for HW2: https://math.stackexchange.com/questions/5031061/prove-that-a-monoid-is-trivial-using-some-specific-conditions/5031092#5031092
 \lstset{language=Isabelle}
 \begin{lstlisting}
 theory IbookCh0
