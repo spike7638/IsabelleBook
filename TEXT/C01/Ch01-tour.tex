@@ -229,6 +229,9 @@ Your proof was probably one of these, but there are surely others. If yours was
 
 For the remainder of this chapter, there's one overarching task: type in everything you see here, observe what happens, then keep reading (possibly deleting something you typed as an experiment). 
 
+
+
+
 Let's see one of Isabelle's strong points right here. We're going to ask it to find a proof, and it's going to try a bunch of strategies --- simplification, 'tableau solvers', a reasoner for linear arithmetic, something called a SAT-solver, etc. --- and see what it can come up with. Typing the word \isi{try} makes all this happen. Sadly, especially for new users, \isi{try} sometimes reports that a proof is easy, but doesn't tell you what to type, which is infuriating. Much nicer is \isi{try0}. So right after our lemma, we'll type \isi{try0} (which dispatches a bunch of processes that report back) and wait for a moment:
 \begin{figure}[h]
     \includegraphics[width=0.5\linewidth]{TEXT/C01//Images/try0.png}
@@ -272,10 +275,10 @@ Now let's try to do another proof of this theorem. 
 Isabelle has done a bit of looking ahead and realized this lemma is particularly easy to prove: it's a consequence of the lemma immediately above (which it has called \isi{IBookCh1.evens}, because we gave it the name \isi{evens}, and it's in a document called \co{IBookCh1.thy}). Unfortunately, it has \textit{not} said how to actually write the proof in Isabelle -- the sort of thing that \isi{try0} might have helped with. It turns out that the magic incantation is \isi{using evens by auto} (although \isi{simp} and \isi{blast} could be used instead of \isi{auto} --- any one of them is capable of making the leap from the statement of \isi{evens} to the statement of \isi{evens2}!) Go ahead and type this to see that you've got a second complete-and-proved lemma.
 \etask 
 
-\digression[Proof methods]{Isabelle has several built-in proof methods, tools that help us get from what we know to what we want to prove. Names you'll often see are \isi{auto}, \isi{blast}, \isi{simp}, \isi{metis}, \isi{presberger}. Each is good at one thing. The \isi{simp} method, for instance, is good at a particular standardized form of simplification, as the name suggests\footnote{But while \isi{simp} can do a lot, it doesn't --- without some help and guidance --- handle any kind of algebra with exponents, for example, something most math students do easily in their heads.}. For now we're going to aim to use \isi{auto} as often as possible, but when other names pop up in the next chapter, try to just say to yourself ``I suppose he'll explain what that method does at some point.''
+\digression[Proof methods]{Isabelle has several built-in proof methods, tools that help us get from what we know to what we want to prove. Names you'll often see are \isi{auto}, \isi{blast}, \isi{simp}, \isi{metis}, \isi{presberger}. Each is particularly good at one thing. The \isi{simp} method, for instance, is good at a particular standardized form of simplification, as the name suggests\footnote{But while \isi{simp} can do a lot, it doesn't --- without some help and guidance --- handle any kind of algebra with exponents, for example, something most math students do easily in their heads.}. For now we're going to aim to use \isi{auto} as often as possible, but when other names pop up in the next chapter, try to just say to yourself ``I suppose he'll explain what that method does at some point.''
 }
 
-Let's try to do one of our \textit{own} proofs of the theorem. Once more, copy-paste the theorem statement and change the name, this time to \isi{evens3}. With your cursor after the theorem, the \sys{Output} panel should now be offering you two ways to trivially prove your theorem, but we're going to ignore those. The \sys{State} panel in the right-hand column is showing this:
+Let's try to write one of our \textit{own} proofs of the theorem in Isabelle. Once more, copy-paste the theorem statement and change the name, this time to \isi{evens3}. With your cursor after the theorem, the \sys{Output} panel should now be offering you two ways to trivially prove your theorem, but we're going to ignore those. The \sys{State} panel in the right-hand column is showing this:
 \begin{figure}[h]
     \includegraphics[width=0.75\linewidth]{TEXT/C01/Images/state-panel.png}
 \end{figure}
@@ -322,7 +325,13 @@ have "2*(k+1) > k"
 \task Go ahead and type that on a line by itself and note the change in the Output and in the State panels. Note: the ``star'' for multiplication is essential. Try deleting it and see what kinds of error messages appear; then replace it. Remember this experience though, because sometime in the future you'll again mis-type something in these double-quotes and get a similar error message, which may seem cryptic until you realize that you need to be really careful in writing math for Isabelle.
 \etask
 
-When we're marshaling facts like this (it's not really a `fact' yet because we haven't proved it!) it's nice to give them names. We'll see why in a moment. In this case let's give it the name `example', by writing
+A warning for new Isabelle users: it's \textit{really} easy to forget quotation marks. Here's an example of a small theorem-statement. 
+\begin{figure}[h]
+    \includegraphics[width=0.5\linewidth]{TEXT/C01//Images/missing_quotes.png}
+\end{figure}
+The second-to-last line asserts a fact to be shown, but the author has failed to put quotation marks around the fact. Isabelle makes a best-effort at parsing, but at them moment it encounters the not-equal sign, it gives up. I suppose that I still make this mistake on about one in every twenty facts I assert. Sometimes it's because I've copy-pasted, and left off the quotation mark. Sometimes it's forgetfulness. Either way, it's maddening. Start training yourself right now to \textit{always} type those quotation marks!
+
+When we're marshaling facts like the one above (it's not really a `fact' yet because we haven't proved it!) it's nice to give them names. We'll see why in a moment. In this case let's give it the name `example', by writing
 \begin{IS}
 have example: "2*(k+1) > k"    
 \end{IS}
@@ -349,7 +358,7 @@ But it's more idiomatic to write this:
     \includegraphics[width=0.75\linewidth]{TEXT/C01/Images/good-show.png}
 \end{figure}
 
-That \isi{?thesis} is shorthand for ``the thing we promised to prove'', more or less. 
+That \isi{?thesis} is shorthand for ``the thing we promised to prove'', more or less. (more precisely, it's the thing we promised to show before the most recent \isi{proof -} line). 
 
 We can complete the proof with \isi{using example by blast}. The \isi{using} adds the fact we called \isi{example} to the set of things Isabelle can work with, and \isi{blast} is a prover that does reasoning that includes things like $P(a) \implies \exists x . P(x)$.
 
@@ -411,7 +420,7 @@ Induction. Again the case $k = 0$ is trivial. Suppose that for some $k > 0$ we h
 
 The proof, in Isabelle:
 
-\begin{figure}[H]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.75\linewidth]{TEXT/C01/Images/proof3.png}
     \caption{A proof by induction}

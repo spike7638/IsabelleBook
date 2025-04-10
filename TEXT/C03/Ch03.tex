@@ -119,7 +119,7 @@ I.e., if we want to show that P implies Q, it's sufficient to show that using th
 Recommended reading: Consider reading through a good chunk of the Wikipedia article on natural deduction (https://en.wikipedia.org/wiki/Natural\_deduction as of 4/28/2023) to get a somewhat more authoritative and thorough description of it. 
 
 Arrows and 'and' and implications and bags of facts
-If you have a choice between (a) knowing P, Q, and that having both allows you to conclude R and (b) knowing ``$P  \wedge  Q \implies R$'', in Isabelle you should definitely prefer the first, because most of the provers are much better at working with the first than the second. We've used fix-assume-show form for this kind of thing. If we have a theorem of the form
+If you have a choice between (a) knowing P, Q, and that having both allows you to conclude R and (b) knowing ``$P  \wedge  Q \implies R$'', in Isabelle you should definitely prefer the first, because most of the provers are better at working with the first than the second. We've used fix-assume-show form for this kind of thing. If we have a theorem of the form
 
 \begin{IS}
 theorem:
@@ -153,9 +153,51 @@ There's one more aspect to HOL that we've used but that I haven't mentioned: the
 
 To do: ConjI and ConjE and AllI using \ldots however you search! \ldots  and give details here. Also AllI, AllE, SomeI, SomeE
 
+By the way, doing logic proofs using basic inference rules can be a pain, but there are tools to help you. Consider this problem from math.stackexchange.com, slightly edited:
+
+
+\begin{quote}   
+We have these two assumptions: (a) “Logic is difficult or not many students like logic.” and (b) “If mathematics is easy, then logic is not difficult.”
+
+By translating these assumptions into statements involving propositional variables and logical connectives, can we determine weather the following statement is valid conclusion of these assumptions using rules of inference?
+
+\emph{If not many students like logic, then either mathematics is not easy or logic is not difficult.}
+
+[...]
+
+I have used these logical variables
+$l$: logic is difficult; $s$: many students like logic; 
+$m$: mathematics is easy.
+
+By translating we have:
+\begin{align}
+l \vee \neg s \\
+m \to \neg l
+\end{align}
+and we want to conclude 
+\begin{align}
+\neg s \to (\neg m \vee \neg l)
+\end{align}
+\end{quote}
+We can actually use an online resource \href{https://www.umsu.de/trees/#(q~1(~3s))~1(m~5(~3q))~5((~3s)~5((~3m)~2(~3q)))}{online resource} to answer this. The result is shown in Figure~\ref{fig:logic-proof}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\linewidth]{TEXT//C03//Images/logic-proof.png}
+    \caption{A proof of the conclusion of the stack-exchange question}
+    \label{fig:logic-proof}
+\end{figure}
+To read this proof, you need to know that $a \to b$ can be rewritten as $b \vee \neg a$, which I'll call the 'implication rule' for now. To prove the claim, the prover starts by assuming the implication is \textit{false}, and trying to derive from this some known-to-be-false statement(s). So line 1 assumes the negation of the desired conclusion. 
+
+Applying the implication rule, and then negating $b \vee \neg a$ gives us $\neg v \wedge a$, and 'conjunction elimination' (saying that $A \wedge B$ tells you both $A$ and $B$) we get the assertions in lines 2 and 3. Doing the same thing to line 3 gives us the two facts in line 4 and 5. Applying negation to the $\vee$ in line 5, and then conjunction elimination, gets use the facts in lines 6 and 7. Double negation elimination gets us facts 8 and 9. 
+
+Splitting fact 2 gets us facts 10 and 11. Applying the implication rule to fact 11, and then using conjunction-elimination, gets you $\neg q$ and $\neg m$, which contradict facts 8 and 9, hence we've derived a falsehood. 
+
+The tool that provided that proof is a \emph{tableau solver} written by Wolfgang Schwarz of the University of Edinburgh. I include it here because you may be interested in the source code on github, and because "tableau solvers" are one of the many methods implemented by some of the tools in Isabelle. The  \href{https://en.wikipedia.org/wiki/Method_of_analytic_tableaux#:~:text=A%20tableau%20checks%20whether%20a,is%20unsatisfiable}{Wikipedia page} gives a nice summary of tableaux solvers. 
+
 \section{More Interface Bits and Pieces}
 
-While you were working through those proofs from Spivak, you probably got to the point where you said ``Hey\ldots was ``lt'' defined in terms of ``gt'' or the other way around? And was the rule for multiplication being commutative called ``\co{mul_commute}'', ``\co{mult_com'}', or one of 15 other possible variants? This is where the ``sidekick'' panel on the right comes in: it shows you everything in your theory. Want to jump to the definition of ``neg''? Click on it! By the way, if the Sidekick panel seems to not match what you've been typing, save your document, and the Sidekick contents will be refreshed. (Apparently updating while you're typing is problematic in some way, so it's only triggered on save.)
+While you were working through those proofs from Spivak, you probably got to the point where you said ``Hey\ldots was \isi{lt} defined in terms of \isi{gt} or the other way around? And was the rule for multiplication being commutative called ``\co{mul_commute}'', ``\co{mult_com'}', or one of 15 other possible variants? This is where the \co{sidekick} panel on the right comes in: it shows you everything in your theory. Want to jump to the definition of \isi{neg}? Click on it! By the way, if the Sidekick panel seems to not match what you've been typing, save your document, and the Sidekick contents will be refreshed. (Apparently updating while you're typing is problematic in some way, so updates are only triggered on save.)
 
 Speaking of remembering/discovering things, if you open a proof document and (on a mac) press the command key (CTRL on Windows) while your cursor is above some term, you'll see something like this:
 
@@ -217,7 +259,7 @@ declare[[show_types, show_abbrevs, sh ...]]
 and as you type that last ``sh'' a list of other things you might want to show is offered as a tool-tip. I seldom use these, but \co{show_types} may be useful to you as you're getting started. 
 
 Getting to proofs faster and more simply
-One thing you might have learned from the Spivak proofs is that most of the time, you knew something (fact1) and you had something else (fact2) that relates this to some other thing, and you applied fact2 to fact1 to get some new ``fact1'' for the next step. There's seldom a 'big picture' situation where you needed to combine 7 things all at once to get an answer. On the other hand, if you resorted to sledgehammer, you found that it sometimes did exactly this combination of 14 different items to do a whole lot of steps privately and then just say ``yep\ldots I got it!'' You might be wishing you could do the same thing. But if you look at the proof state during the middle of a proof, there's typically just one fact in your bag of facts (``this''), and you have to pull in fact2 be realizing that some theorem could be applied to ``this'', or some definition would let %you transform ``this'', etc. In the meantime, ``by auto'' seems to be doing a lot of things under the hood: if %a simple deduction leads to \co{(Z \notequal Z) \/ x \in P}, for instance, ``auto'' may be able to conclude %that x is in P, because the first clause of the ``or'' is false, so the second must be true. How's it doing %that? 
+One thing you might have learned from the Spivak proofs is that most of the time, you knew something (fact1) and you had something else (fact2) that relates this to some other thing, and you applied fact2 to fact1 to get some new ``fact1'' for the next step. There's seldom a 'big picture' situation where you needed to combine 7 things all at once to get an answer. On the other hand, if you resorted to sledgehammer, you found that it sometimes did exactly this combination of 14 different items to do a whole lot of steps privately and then just say ``yep\ldots I got it!'' You might be wishing you could do the same thing. But if you look at the proof state during the middle of a proof, there's typically just one fact in your bag of facts (``this''), and you have to pull in fact2 be realizing that some theorem could be applied to ``this'', or some definition would let %you transform ``this'', etc. In the meantime, ``by auto'' seems to be doing a lot of things under the hood: if %a simple deduction leads to \co{(Z \negequal Z) \/ x \in P}, for instance, ``auto'' may be able to conclude %that x is in P, because the first clause of the ``or'' is false, so the second must be true. How's it doing %that? 
 
 % XXX Fix broken text above
 
@@ -228,7 +270,7 @@ Isabelle has a simplifier, and it's freaking amazing. It's at the heart of auto;
 
 Now whenever you need to change ``a + Z'' to just ``a'', you no longer need to say \isi{using additive_ident}, because it's in the simpset, and if you're doing a proof by auto or simp, it'll be seen. (There may be other provers that don't necessarily refer to the simpset, but this already takes you a long way.)
 
-In much the same way, there are ``introduction'' and ``elimination'' rules beyond those mentioned in natural deduction, and you can add to the introset and elimset in the same way. The rule that says to replace every occurrence of \isi{diff a b} with \isi{a + neg b} might be considered both an elimination rule and a simplification rule, so you could put ``[simp, elim]'' before the colon. Good Isabelle users add simplification, introduction, and elimination rules whenever possible. 
+In much the same way, there are ``introduction'' and ``elimination'' rules beyond those mentioned in natural deduction, and you can add to the introset and elimset in the same way. The rule that says to replace every occurrence of \isi{diff a b} with \isi{a + neg b} might be considered both an elimination rule and a simplification rule, so you could put ``[simp, elim]'' before the colon. Good Isabelle users add simplification, introduction, and elimination rules whenever possible, within limits. Imagine that you've defined the Fibonacci numbers recursively. Eliminating \isi{fib} in \isi{fib 4} might produce \isi{ (fib 3_ + (fib 2)}, which elimination then changes to \isi{fib 2 + fib 1 + fib 1 + fib 1}, and then \isi{fib 1 + fib 1 + fib 1 + fib 1 + fib 1}, which finally can be converted to \isi{1 + 1 + 1 + 1+ 1}. That's OK in this simple example, but what if it had been \isi{fib 20}? You really don't want to produce $2^20$ terms, right? 
 
 Why would you want an introduction rule, though? Why not just get rid of all occurrences of diff during your proof? Well, what if the goal is to show that ``diff a b \in P''? You either need to eliminate the ``diff'' from the goal somehow (and we haven't really considered that yet), or you need a way to introduce a diff in the last step of your proving, so that you have something that unifies with the goal. 
 
@@ -266,24 +308,28 @@ qed
 \end{IS}
 
 At this point, 0, 3, 4, and 5 can be eliminated because they're never used. In going from 3 to 4, we use the fact that a + (neg a) is Z (i.e., zero), which appears a few lines before as 
+\begin{IS}
 lemma  negation: (* Spivak calls this P3 *)
   fixes a::r
   shows "a ⊕ (neg a) =  Z"
   and  "(neg a) ⊕ a =  Z"
   sorry
+\end{IS}
 
 Let's add the [simp] attribute to this theorem:
 
+\begin{IS}
 lemma  negation [simp]: (* Spivak calls this P3 *)
 ...
-
+\end{IS}
 Now we can change things to read
+\begin{IS}
 have 3: "x ⊕ (a ⊕ (neg a)) = b ⊕ (neg a)" using 1 2 by auto
 hence 4: "x ⊕ Z = b ⊕ (neg a)" by auto
+\end{IS}
 
 But if auto can do both those steps, can it do them both at the same time? Yes! We can change things to 
 \begin{IS}
-
   have 0: "x ⊕ a = b" using assms by auto
   hence 1: "(x ⊕ a) ⊕ (neg a) = b ⊕ (neg a)" by auto
   have 2: "(x ⊕ a) ⊕ (neg a) = x ⊕ (a ⊕ (neg a))" using plus_assoc by auto
@@ -291,7 +337,8 @@ But if auto can do both those steps, can it do them both at the same time? Yes! 
   hence 5: "x = b ⊕ (neg a)" using additive_ident(1) by auto
   then show ?thesis using diff_def by auto
 \end{IS}
-Now converting \isi{x + Z} to just \isi{x} is another pretty obvious simplification, so we can go back to the \isi{additive_ident} theorem and add \isi{[simp]} there as well:
+
+Now converting \isi{x + Z} to just \isi{x} is another pretty obvious simplification, so we can go back to the \isi{additive_ident} theorem and add \isi{[simp]} there as well/
 
 And now line 5 becomes
 \begin{IS}    
@@ -307,10 +354,7 @@ proof -
   then show ?thesis using diff_def by auto
 qed
 \end{IS} 
-
 where I've eliminated label "5" because it was no longer in use. At this point, going from fact 0 all the way to fact formerly-5 involves just repeated applications of auto, except that we've used the assumption (at fact 0) and \isi{plus_assoc} (at fact 2). Let's try a big step and combine them all!
-
-
 
 Wow! That proof sure is getting shorter! If we look at the proof state with the cursor at the end of the ``have" line, it says that we know x = b + (neg a), and we want to show that x = b - a. Well, those are connected by the definition of ``diff'', as suggested in the ``show'' line. So we could, in fact, turn this into one line:
 
@@ -320,11 +364,9 @@ show ?thesis using  assms plus_assoc  diff_def by auto
 
 \ldots but let's hold off on that for a moment. Rather that using \isi{diff_def} to push things further towards the goal, we're going to use it to simplify the goal:
 
-
 If you place the cursor in the location shown, you can see that the goal has been modified. Try putting the cursor both before and after the \isi{unfolding diff_def} so see the change. After the unfolding, the goal becomes 
 
 \ldots which is what we've already managed to reach. So we can write a final idiomatic proof:
-
 
 In summary: adding a few things to the simpset made our proof a lot shorter and simpler. Using ``unfolding'' let us simplify the goal a little. But as a result of doing all these steps, the didactic message of Spivak's presentation was lost. 
 

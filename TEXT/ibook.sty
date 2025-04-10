@@ -15,6 +15,7 @@
 \usepackage{amsmath, amssymb}
 \usepackage{float}
 \usepackage{unicode-math}
+\usepackage{hyperref}
 %\usepackage[utf8]{inputenc}
 %% Adjust page structure so marginnotes work
 \geometry{
@@ -23,6 +24,14 @@
  marginparwidth=70mm
  }
 
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+    }
 %% Set up "Digression" boxes
 \mdfsetup{skipabove=\topskip,skipbelow=\topskip}
 \global\mdfdefinestyle{digression}{%

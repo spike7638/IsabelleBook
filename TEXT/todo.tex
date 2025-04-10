@@ -28,10 +28,11 @@ Stuff isabelle produces: what do def, fun, etc, insert into environment. How do 
 \item .get Sys language definition working: fixed wdth font, pale blue background
 \end{itemize}
 
+\begin{verbatim}
+
 Pointer to isabelle community cookbook: https://isabelle.systems/cookbook
 
-"value" to use a debugging tool:
-
+"value" to use a debugging tool (and warning about things whose values can't be printed)
 datatype pointD = Hd | Ad | Bd | Cd| Dd| Ed| Fd| Pd | Qd |Rd
 definition PointsD::"pointD set"  where "PointsD = {Hd, Ad, Bd, Cd, Dd, Ed, Fd, Pd, Qd, Rd}"
 
@@ -39,7 +40,32 @@ value "PointsD" produces
 "{Hd, Ad, Bd, Cd, Dd, Ed, Fd, Pd, Qd, Rd}"
   :: "pointD set"
 
+
+"thm" as a debugging tool
+
+Every theorem is a function! Example: 
+lemma X: 
+  assumes "a > 10"
+  assumes "b > 15"
+  shows "a + b > 25"
   
+shows up as 
+
+[?a > 10] => [?b > 15] => [?a + ?b > 25]
+
+That means you can type X [OF 13 19] and get
+
+[13 > 10] => [19 > 15] => [13 + 19 > 25]
+
+which you can read as "if 13 > 10 adn 19 > 15, then 13 + 19 > 25." Cool!
+
+Using x by y : you can see what's happening here by looking at the state with your cursor just before 'using', just after x, etc. 
+
+tracing simp
+
+\end{verbatim}
+
+
 \subsection{Doing proofs right}
 Once you've done some more Spivak proofs ... we'll move into affine geometry. 
 To prove the affine plane on 4 points is an affine plane, we need to show all the axioms hold. The only really messy one is 
