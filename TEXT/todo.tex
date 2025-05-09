@@ -27,42 +27,7 @@
 
 Pointer to isabelle community cookbook: https://isabelle.systems/cookbook
 
-\subsection{Doing proofs right}
-Once you've done some more Spivak proofs ... we'll move into affine geometry. 
-To prove the affine plane on 4 points is an affine plane, we need to show all the axioms hold. The only really messy one is 
-\begin{verbatim}
-    "¬ affine_plane_data.collinear
-           A4Points
-           A4Lines
-           A4meets Pa Qa Ra"
-\end{verbatim}
-Proving a negation \textit{could} be done by expanding the definition of collinear (a conjunction of several items), negating it (using blast), and then showing that each of the resulting disjunction elements is false...but one of these is existentially quantified, so it becomes universally quantified, so it requires working through all possible lines one at a time. 
-
-Instead, the right approach is classical contradiction: we assume they ARE collinear, fix a line $n$ that contains all three, and show this leads to nonsense. (A simple way, in this case, is to observe that the cardinality of $n$ must be at least 3, but the cardinatlity of each line in A4 is exactly 2, but we instead work through the details because it's instructive for later proofs, and ISabelle is good at enumerate-and-check approaches.) 
-
-Warning: I want to use ccontr to show the statement above. My first version said
-\begin{IS}
-proof (rule ccontr)
-    assume cHyp: "affine_plane_data.collinear
-           A4Points
-           A4Lines
-           A4meets Pa Qa Ra"
-    ...
-\end{IS
-but that failed badly. Why? Because the thing you assume must be the negation of the thing you want to prove; I should have written
-\begin{IS}
-proof (rule ccontr)
-    assume cHyp: "¬¬affine_plane_data.collinear
-    ...
-\end{IS
-i.e., simply put a negation sign in front of the desired goal. The fact that ¬¬ is the same as "no negations at all" eludes Isabelle (!)
-
-
-
-
 Example citation: \cite{latex2e}.
-
-Searching quick tutorial: page 34 of https://isabelle.in.tum.de/doc/tutorial.pdf
 
 \begin{verbatim}
 Book design:
