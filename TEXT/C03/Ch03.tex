@@ -183,7 +183,7 @@ We can actually use an online resource \href{https://www.umsu.de/trees/#(q~1(~3s
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.5\linewidth]{TEXT//C03//Images/logic-proof.png}
+    \includegraphics[width=0.5\linewidth]{C03//Images/logic-proof.png}
     \caption{A proof of the conclusion of the stack-exchange question}
     \label{fig:logic-proof}
 \end{figure}
@@ -485,17 +485,17 @@ proof -
   show P ≠ Q using assms try 
 ...
 \end{IS}
-The first mistake here is that you probably want to use the more idiomatic \isi{show ?thesis} as a matter of habit, but perhaps you're still learning and want to write out explicitly the thing you're trying to show. It seems totally obvious, but neither 'try' nor 'sledgehammer' can get anywhere. What's wrong? You need to put \isi{P ≠ Q} in quotes:
-\isi{show "P ≠ Q" using assms by auto} works fine. 
+The first mistake here is that you probably want to use the more idiomatic \isi{show ?thesis} as a matter of habit, but perhaps you're still learning and want to write out explicitly the thing you're trying to show. It seems totally obvious, but neither 'try' nor 'sledgehammer' can get anywhere. What's wrong? You need to put \isi{P \\<notequal> Q} in quotes:
+\isi{show "P \\<notequal> Q" using assms by auto} works fine. 
 
 \item Use Isabelle's color-coding hints! Here's a lemma I proved about "A2", the 2-dimensional affine plane:
 \begin{figure}[h]
-    \includegraphics[width=0.5\linewidth]{TEXT/C03/Images/good-statement.png}
+    \includegraphics[width=0.5\linewidth]{C03/Images/good-statement.png}
 \end{figure}
 
 Contrast that with this incorrect lemma statement:
 \begin{figure}[h]
-    \includegraphics[width=\linewidth]{TEXT/C03/Images/bad-statement.png}
+    \includegraphics[width=\linewidth]{C03/Images/bad-statement.png}
 \end{figure}
 They really look pretty similar, but in the second lemma, I've used "Points" and "Lines" rather than "A2Points" and "A2Lines". The first two have not been defined, while the second two have. That makes the first two "free" variables -- it's as if my theorem statement said "For all sets Points and Lines, if P is in Points and ..."
 That's not what I intended at all. The big clue here is the color: in the first theorem statement, \isi{A2Points} is in black, indicating a bound variable. In the second, \isi{Points} is in blue, indicating a free variable (one that will be implicitly included in a 'forall' at the start of the lemma. (The same goes for \isi{meets} and \isi{find_parallel}.) Informal summary: "Red is horrible. Blue is probably bad." 

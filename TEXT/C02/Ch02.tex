@@ -34,7 +34,7 @@ You can write a program that links to Isabelle, or even write code within an Isa
 Looking at the bottom of the center column of the interface, we see this:
 \begin{figure} [h]
     \centering
-    \includegraphics[width=0.5\linewidth]{TEXT//C02//Images/image.png}
+    \includegraphics[width=0.5\linewidth]{C02//Images/image.png}
     \caption{A section of the interface}
     \label{fig:interface-section}
 \end{figure}
@@ -44,7 +44,7 @@ with \sys{Output} highlighted because we've been using this panel to see what's 
 But the \sys{Symbols} tab is also useful. Click on it, and you'll see a selection of choices:
 \begin{figure} [h]
     \centering
-    \includegraphics[width=0.75\linewidth]{TEXT//C02//Images/symbols.png}
+    \includegraphics[width=0.75\linewidth]{C02//Images/symbols.png}
     \caption{The \sys{Symbols} panel has a bunch of options!}
     \label{fig:symbols-panel}
 \end{figure}
@@ -52,7 +52,7 @@ But the \sys{Symbols} tab is also useful. Click on it, and you'll see a selectio
 where I've clicked on the choice \sys{Arrow}, which shows all the kinds of arrows available in Isabelle. If you move your cursor over one and let it rest there for a moment, a tooltip appears:
 \begin{figure}
     \centering
-    \includegraphics[width=0.5\linewidth]{TEXT//C02//Images/tooltip.png}
+    \includegraphics[width=0.5\linewidth]{C02//Images/tooltip.png}
     \caption{The tooltip for the double-right-arrow}
     \label{fig:double-right}
 \end{figure}
@@ -503,12 +503,12 @@ More generally, one can write \isi{int set} or \isi{(int => int) set} or
 Set containment is indicated using \isi{\\<in>}, which you produce by typing \verb!\in!, pausing briefly until a drop-down menu of choices appears, and then pressing TAB. 
 With that brief introduction, you can work through the rest of the document, which ends with a proof of the triangle inequality. 
 
-At some point you may find yourself trying to do a proof by cases, perhaps when you're trying to show something like \isi{abs x ≥ 0}. You start your proof with 
+At some point you may find yourself trying to do a proof by cases, perhaps when you're trying to show something like \isi{abs x \\ge 0}. You start your proof with 
 \begin{IS}
     proof (cases "x \in P")
 \end{IS}
-and Isabelle helpfully generates the structure for two cases, which you can paste into your document by clicking on it. The two cases are (i) the one where \isi{x \in P} is assumed true, and (ii) the one where \isi{x \in P} is assumed false. If you can show that your theorem is true in both these cases, you're done. In the first of these cases, you get to work with the fact that \isi{x} is in the set \isi{P}.  But what is that fact \textit{called}? Amazingly enough, it's called \isi{True} and the opposite fact, used in the other case, is called \isi{False}. There's a reason for this: the thing you've provided to the \isi{cases} method of proof is a boolean, so its two possible values are \isi{True} and \isi{False}. If I were writing this proof method, I might have chosen to call the associated facts something like \isi{True_case} and \isi{False_case}, but that's not what happened. Regardless, this means that you may find yourself writing something like 
-\isi{show ... using P_def True by simp}, where \isi{True} here means ``the fact that \isi{x \in P}.
+and Isabelle helpfully generates the structure for two cases, which you can paste into your document by clicking on it. The two cases are (i) the one where \isi{x \\in P} is assumed true, and (ii) the one where \isi{x \\in P} is assumed false. If you can show that your theorem is true in both these cases, you're done. In the first of these cases, you get to work with the fact that \isi{x} is in the set \isi{P}.  But what is that fact \textit{called}? Amazingly enough, it's called \isi{True} and the opposite fact, used in the other case, is called \isi{False}. There's a reason for this: the thing you've provided to the \isi{cases} method of proof is a boolean, so its two possible values are \isi{True} and \isi{False}. If I were writing this proof method, I might have chosen to call the associated facts something like \isi{True_case} and \isi{False_case}, but that's not what happened. Regardless, this means that you may find yourself writing something like 
+\isi{show ... using P_def True by simp}, where \isi{True} here means ``the fact that \isi{x \\in P}.
 
 
 \subsection{Reflections}
@@ -603,10 +603,10 @@ To do items
 Can we make some of those steps just be natural? Why, when we define something like "neg", do we have to keep citing \isi{neg_def}? Answer: intros and simp sets. 
 
 mention that almost every theorem looks like a function. Evens, for example, becomes
-\isi{?n => \exists k : 2*k > ?n}
+\isi{?n => \\exists k : 2*k > ?n}
 
 That's why "of" works. You can examine "evens [of 3]" and see that it's the statement
-\isi{\exists l . 2*k > 3}
+\isi{\\exists l . 2*k > 3}
 
 
 
