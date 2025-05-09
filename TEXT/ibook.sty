@@ -9,11 +9,14 @@
 \usepackage{graphicx}
 \usepackage{sys-listings}
 \usepackage{isabelle-listings}
+\usepackage{isabellesym}
 \usepackage{geometry}
 \usepackage{bussproofs}
 \usepackage{amsmath, amssymb}
 \usepackage{float}
-\usepackage[utf8]{inputenc}
+\usepackage{unicode-math}
+\usepackage{hyperref}
+%\usepackage[utf8]{inputenc}
 %% Adjust page structure so marginnotes work
 \geometry{
  left=10mm,
@@ -21,6 +24,14 @@
  marginparwidth=70mm
  }
 
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+    }
 %% Set up "Digression" boxes
 \mdfsetup{skipabove=\topskip,skipbelow=\topskip}
 \global\mdfdefinestyle{digression}{%
@@ -45,6 +56,8 @@ leftmargin=0cm,rightmargin=0cm%
 %% Misc structural commands
 \newcommand{\term}[1]{\textbf{#1}}
 \newcommand{\todo}[1]{\framebox{\color{red}#1}}
+\newcommand{\rs}[1]{{\color{green}{\framebox{\color{black}#1}}}}
+\newcommand{\rsdone}[1]{}
 
 %% Code appearance
 % Define how "system" stuff looks. 
@@ -57,7 +70,7 @@ leftmargin=0cm,rightmargin=0cm%
 % Inline Isabelle code
 \definecolor{light-gray}{gray}{0.9}
 %\newcommand{\isi}[1]{\colorbox{light-gray}{\lstinline[language={Isabelle}]{#1}}}
-\NewDocumentCommand{\isi}{v}{\colorbox{light-gray}{\lstinline[language={Isabelle}]|#1|}}
+\NewDocumentCommand{\isi}{m}{\colorbox{light-gray}{\lstset{language=Isabelle}\lstinline|#1|}}
 
 \lstnewenvironment{IS} {\lstset{language=Isabelle}\leavevmode}{}
 
